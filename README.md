@@ -1,203 +1,351 @@
-# MEMZO — Subscription Management System
+# MEMZO – Subscription Management System
 
-**MEMZO** is a centralized, database-driven Subscription Management System engineered for a software company selling its own proprietary software products through tiered subscription plans (Monthly, Yearly, etc.).
+## 1. Project Overview
 
----
+**MEMZO** is a centralized, database-driven Subscription Management System developed for a software company that sells its own software products through different subscription plans.
 
-## 1. Visual Blueprint & Design Identity
+The system provides a unified platform to manage software products, subscription plans, customers, subscriptions, quotations, invoices, payments, discounts and taxes.
 
-The visual design is built to recreate the **SIXOY website reference blueprint** while adapting the branding, typography, and content for a subscription management SaaS platform.
+It supports three types of users – Admin, Staff and Customer – with separate access permissions and functionalities.
 
-### Design Tokens
-| Token | Hex | Usage |
-|---|---|---|
-| **Deep Teal** | `#062722` | Hero background, navigation bars, primary branding accents |
-| **Mint Green** | `#91E8C1` | Hero headline, glowing accents, badge highlights |
-| **Lime Green** | `#C9FF82` | Primary CTA buttons, interactive hover highlights |
-| **Soft Cream** | `#F0F2DF` | Outer page backdrop, framing borders, subtle sections |
-| **Pure White** | `#FFFFFF` | Main content cards, tables, dashboard panels |
-| **Main Text** | `#171C19` | High-contrast typography and headings |
-| **Secondary Text** | `#777F79` | Descriptive copy, timestamps, subtitles |
-| **Light Border** | `#E6E9E2` | Refined card, modal, and table dividers |
+MEMZO aims to simplify subscription operations, improve record management and provide an organized way to monitor subscription activities and payments.
 
-### Blueprint Sections Implemented on Landing Page (`/`)
-1. **Teal Hero Section:** Fixed max-width canvas framed inside soft cream, centered mint green headline (*"Your subscriptions. One smarter platform."*), lime green CTA button, and a 3D-styled glowing device mockup collage with floating subscription KPI cards.
-2. **Horizontal Software Logo Strip:** Clean monochrome logo bar featuring MEMZO's enterprise software suite: *BrightBooks, StaffTrack, StockMaster, EduManage, ShopFlow, CloudGuard*.
-3. **Core Features Section:** Centered headline with interactive horizontal pill tabs (*Product Management, Subscription Tracking, Invoices & Payments, Discounts & Taxes*) and feature overview cards.
-4. **Two-Column Feature Showcase:** Left column with feature tag, headline, description, and action CTA; right column featuring a rounded lime-tinted dashboard mockup with a floating glassmorphic card.
-5. **Use-Case Grid Showcase:** 4 rounded cards with modern imagery and bottom pill badges (*Accounting & ERP, Workforce Management, School & Campus, Retail & POS*).
-6. **Footer:** Deep teal navigation footer with branding, product directory, legal links, and status indicator.
+## 2. Problem Statement
 
----
+Managing software subscriptions manually can become difficult as the number of customers, products and transactions increases.
 
-## 2. Technology Stack & Architecture
+Maintaining customer records, tracking subscription periods, generating invoices, monitoring payments and managing renewals separately can lead to errors and inefficient workflows.
 
-- **Backend:** Python 3.12+ / Flask (Application Factory & Blueprints)
-- **Database:** SQLite (`database/memzo.db`)
-- **ORM:** Flask-SQLAlchemy (14 normalized database models)
-- **Authentication:** Flask-Login with Werkzeug password hashing
-- **Security & Forms:** Flask-WTF with CSRF token protection
-- **Frontend:** Jinja2 templates, Bootstrap 5 grid utilities, Vanilla CSS custom styling, and Chart.js
+MEMZO addresses these challenges by providing a centralized platform where subscription-related activities can be managed and monitored efficiently.
 
-### Project Directory Structure
+## 3. Objectives
+
+- Develop a centralized subscription management platform.
+- Manage software products and their subscription plans.
+- Maintain customer and staff information.
+- Create, track and manage subscriptions.
+- Generate quotations and invoices.
+- Record and monitor payment transactions.
+- Apply discounts and tax rules.
+- Provide role-based access and data protection.
+- Generate reports for monitoring business activities.
+
+## 4. Key Features
+
+### 4.1 Product Management
+- Add, edit and manage software products.
+- Manage product variants and subscription plans.
+- Publish or unpublish products.
+- Display available products through the public catalogue.
+
+### 4.2 Subscription Management
+- Create and manage customer subscriptions.
+- Support monthly and yearly subscription cycles.
+- Track subscription status and validity.
+- Manage subscription renewals and expiry.
+- View subscription details and history.
+
+### 4.3 Customer Management
+- Customer registration and authentication.
+- Maintain customer profiles.
+- View individual subscription details.
+- Access invoices, payment records and notifications.
+
+### 4.4 Quotation Management
+- Create quotations for customers.
+- Add products and quantities.
+- Manage quotation status.
+- Convert accepted quotations into invoices through the application workflow.
+
+### 4.5 Invoice Management
+- Generate invoices for subscription transactions.
+- Calculate subtotals, discounts and taxes.
+- Track invoice status and outstanding balances.
+- Maintain invoice records.
+
+### 4.6 Payment Management
+- Record customer payments.
+- Support partial and full payment records.
+- Track payment status.
+- Update outstanding invoice balances.
+
+**Note:** Payment processing in this project is simulated. No external payment gateway or real financial transaction is involved.
+
+### 4.7 Discount and Tax Management
+- Create and manage discount rules.
+- Support percentage-based and fixed discounts.
+- Configure tax rules.
+- Apply eligible discounts and taxes during invoice calculations.
+
+### 4.8 Reports and Notifications
+- View business and financial reports.
+- Monitor subscription and payment activities.
+- Display notifications and relevant updates to users.
+
+## 5. User Roles and Permissions
+
+MEMZO provides three main user roles.
+
+| Role | Functionalities |
+|---|---|
+| **Admin** | Complete system management, including products, plans, staff, customers, subscriptions, quotations, invoices, payments, discounts, taxes, reports and settings. |
+| **Staff** | Manage customers, subscriptions, quotations, invoices, payments and notifications within assigned permissions. |
+| **Customer** | Register, log in, browse products, purchase plans, view subscriptions, manage renewals, access invoices and payments, and update profile details. |
+
+Each role has a separate dashboard and restricted access to authorized functionalities.
+
+## 6. Technology Stack
+
+| Category | Technologies |
+|---|---|
+| Programming Language | Python |
+| Backend Framework | Flask |
+| Frontend | HTML5, CSS3, JavaScript |
+| UI Framework | Bootstrap 5 |
+| Template Engine | Jinja2 |
+| Database | SQLite |
+| ORM | Flask-SQLAlchemy |
+| Authentication | Flask-Login |
+| Form Validation | Flask-WTF |
+| Security | Werkzeug Password Hashing, CSRF Protection |
+| Charts | Chart.js |
+| Version Control | Git and GitHub |
+
+## 7. System Architecture
+
+MEMZO follows a modular Flask application architecture using the Application Factory pattern and Blueprints.
+
+The application is organized into separate modules based on user roles and functionality.
+
+### Main Components
+
+- **Application Layer:** Handles application initialization, configuration and error handling.
+- **Authentication Layer:** Manages registration, login, logout and password-related operations.
+- **Blueprint Layer:** Separates public, admin, staff and customer functionalities.
+- **Service Layer:** Contains business logic for subscriptions, invoices, payments, discounts, taxes, notifications and reports.
+- **Database Layer:** Stores application data using SQLite and SQLAlchemy models.
+- **Presentation Layer:** Uses HTML templates, CSS, Bootstrap and JavaScript to provide the user interface.
+
+### Application Flow
+
+1. Users access the application through the web interface.
+2. Authentication verifies user credentials.
+3. Role-based access control determines the available functionalities.
+4. Flask routes process user requests.
+5. Service modules execute the required business logic.
+6. SQLAlchemy communicates with the SQLite database.
+7. Results are displayed through Jinja2 templates.
+
+## 8. Database Design
+
+MEMZO uses SQLite as its relational database and Flask-SQLAlchemy as its ORM.
+
+The database contains models representing the major entities of the system, including:
+
+- Users
+- Products
+- Product Variants
+- Plans
+- Subscriptions
+- Subscription Items
+- Quotations
+- Quotation Items
+- Tax Rules
+- Discounts
+- Invoices
+- Invoice Items
+- Payments
+- Notifications
+
+These models represent the relationships between users, products, subscriptions and financial records.
+
+## 9. Project Directory Structure
+
 ```text
 MEMZO/
-├── app.py                     # Flask application factory & error handlers
-├── config.py                  # Environment-driven configuration
-├── extensions.py              # SQLAlchemy, LoginManager, Migrate, CSRF
-├── models.py                  # 14 SQLAlchemy database tables & relationships
-├── forms.py                   # WTForms form definitions with validation
-├── decorators.py              # Role-based access control decorators
-├── utils.py                   # Currency formatting, ID generators, password checks
-├── seed.py                    # Comprehensive database seeder
-├── requirements.txt           # Python dependencies
-├── .env / .env.example        # Environment configuration
 │
-├── database/
-│   └── memzo.db               # Shared SQLite database
+├── app.py
+├── config.py
+├── extensions.py
+├── models.py
+├── forms.py
+├── decorators.py
+├── utils.py
+├── seed.py
+├── requirements.txt
+├── .env.example
 │
 ├── blueprints/
-│   ├── auth/                  # Authentication routes (login, register, reset)
-│   ├── public/                # Public landing page, catalog, checkout
-│   ├── admin/                 # Full administrative management
-│   ├── staff/                 # Operational management & quotations
-│   └── customer/              # Customer self-service portal
+│   ├── auth/
+│   ├── public/
+│   ├── admin/
+│   ├── staff/
+│   └── customer/
 │
 ├── services/
-│   ├── subscription_service.py # Expiry calculation, status transitions, renewals
-│   ├── invoice_service.py      # Subtotal, tax, discount, balance calculations
-│   ├── payment_service.py      # Payment recording, verification, balances
-│   ├── discount_service.py     # Discount eligibility, limits, dates
-│   ├── tax_service.py          # Active tax rules & invoice line calculations
-│   ├── notification_service.py # User notifications & reminders
-│   └── report_service.py       # Revenue aggregations & operational metrics
+│   ├── subscription_service.py
+│   ├── invoice_service.py
+│   ├── payment_service.py
+│   ├── discount_service.py
+│   ├── tax_service.py
+│   ├── notification_service.py
+│   └── report_service.py
 │
 ├── templates/
-│   ├── base.html              # Base HTML with fonts and shared scripts
-│   ├── index.html             # SIXOY blueprint-matching landing page
-│   ├── login.html / register.html / checkout.html / products.html
-│   ├── components/            # Navbars, footers, sidebars, badges, flash messages
-│   ├── admin/                 # 17 Admin management templates
-│   ├── staff/                 # 10 Staff operational templates
-│   └── customer/              # 8 Customer self-service templates
+│   ├── admin/
+│   ├── staff/
+│   ├── customer/
+│   ├── components/
+│   ├── base.html
+│   ├── index.html
+│   ├── login.html
+│   ├── register.html
+│   └── checkout.html
 │
 ├── static/
-│   ├── css/ (style.css, auth.css, dashboard.css, admin.css, staff.css, customer.css)
-│   ├── js/  (main.js, charts.js)
-│   └── images/ (logo.svg, hero mockups, feature cards, showcase images)
+│   ├── css/
+│   ├── js/
+│   └── images/
 │
 └── tests/
-    ├── test_auth.py           # Registration, login, password security
-    ├── test_permissions.py    # Strict role separation and ownership tests
-    ├── test_products.py       # Product catalog, publishing, plans
-    ├── test_subscriptions.py  # Lifecycle, cycles, status transitions, renewal
-    ├── test_invoices.py       # Invoicing, taxes, discounts, balance settling
-    └── test_payments.py       # Payment processing, partial payments, duplicates
+    ├── test_auth.py
+    ├── test_permissions.py
+    ├── test_products.py
+    ├── test_subscriptions.py
+    ├── test_invoices.py
+    └── test_payments.py
 ```
 
----
+## 10. Installation and Setup
 
-## 3. User Roles & Default Test Credentials
+### Prerequisites
 
-The database is pre-seeded with 3 primary user accounts:
+- Python 3.10 or above
+- Git
+- pip package manager
 
-| Role | Email | Password | Access Scope |
-|---|---|---|---|
-| **Admin** | `admin@memzo.com` | `Admin@Password123` | Complete system control: products, variants, plans, staff creation, all customers, quotations, invoices, taxes, discounts, payments, financial reports, system settings. |
-| **Staff** | `staff@memzo.com` | `Staff@Password123` | Operational tasks: customer management, quotation creation, invoice generation & confirmation, recording payments, viewing activity. *(Cannot create staff or alter tax/discount rules)* |
-| **Customer** | `customer@memzo.com` | `Customer@Password123` | Self-service portal: browse catalog, purchase plans via checkout, view active subscriptions, manage renewals, inspect invoices & payment receipts, update profile. |
+### Step 1: Clone the Repository
 
----
-
-## 4. Setup & Running Instructions
-
-### 1. Prerequisites
-- Python 3.10+ (Recommended Python 3.12)
-- Git and virtual environment tools
-
-### 2. Clone and Setup Environment
 ```bash
-# Navigate to the project directory
-cd memzo
+git clone https://github.com/usanamika2006-dotcom/Memzo.git
+cd Memzo
+```
 
-# Create a virtual environment
+### Step 2: Create a Virtual Environment
+
+```bash
 python -m venv venv
+```
 
-# Activate the virtual environment
-# Windows (PowerShell):
+Activate the environment.
+
+**Windows PowerShell:**
+
+```powershell
 .\venv\Scripts\Activate.ps1
-# Windows (Command Prompt):
-.\venv\Scripts\activate.bat
-# Linux / macOS:
-source venv/bin/activate
+```
 
-# Install required dependencies
+**Windows Command Prompt:**
+
+```cmd
+venv\Scripts\activate.bat
+```
+
+**Linux/macOS:**
+
+```bash
+source venv/bin/activate
+```
+
+### Step 3: Install Dependencies
+
+```bash
 pip install -r requirements.txt
 ```
 
-### 3. Initialize & Seed Database
+### Step 4: Configure Environment Variables
+
+Create a `.env` file using `.env.example` as a reference and configure the required application settings.
+
+Do not commit private environment variables or secret keys to the repository.
+
+### Step 5: Initialize and Seed the Database
+
 ```bash
-# Runs migrations/schema creation and populates demo accounts, software products, plans, taxes, discounts, and sample invoices
 python seed.py
 ```
 
-### 4. Run the Development Server
+This initializes and populates the database with demo data and test accounts.
+
+### Step 6: Run the Application
+
 ```bash
 python app.py
 ```
-Open your browser and navigate to **`http://127.0.0.1:5000`**.
 
----
+Open the following address in your browser:
 
-## 5. Running the Automated Test Suite
+```text
+http://127.0.0.1:5000/
+```
 
-A dedicated unit test suite with 16 automated tests verifies authentication, access control permissions, catalog management, subscription life-cycles, tax/discount computations, and invoice balance tracking.
+## 11. Demo User Accounts
+
+The database seeder provides sample accounts for testing the different user roles.
+
+| Role | Email |
+|---|---|
+| Admin | admin@memzo.com |
+| Staff | staff@memzo.com |
+| Customer | customer@memzo.com |
+
+The corresponding demo passwords are configured in the database seeding code. These accounts are intended only for local demonstration and testing.
+
+## 12. Testing
+
+MEMZO includes an automated test suite to verify important application functionalities.
+
+The test modules cover:
+
+- User authentication.
+- Role-based permissions and access control.
+- Product and plan management.
+- Subscription operations.
+- Invoice calculations and balances.
+- Payment recording and validation.
+
+Run the test suite using:
 
 ```bash
-# Run all tests
 python -m unittest discover tests
 ```
 
-Expected result:
-```text
-Ran 16 tests in ~5s
-OK
-```
+## 13. Security and Validation
+
+The application includes several security and validation mechanisms:
+
+- Password hashing using Werkzeug.
+- Authentication using Flask-Login.
+- Role-based access control.
+- CSRF protection using Flask-WTF.
+- Server-side form validation.
+- Customer-specific data access restrictions.
+- Server-side financial calculations using Decimal arithmetic.
+
+These mechanisms help protect application data and ensure that users can access only the functionalities permitted by their roles.
+
+## 14. Conclusion
+
+MEMZO provides an integrated solution for managing software subscriptions and related business operations.
+
+By combining product management, subscription tracking, customer management, quotation generation, invoicing and payment monitoring into one platform, the system helps organize subscription workflows efficiently.
+
+The modular architecture also makes the application easier to maintain and extend with additional functionalities in the future.
 
 ---
 
-## 6. End-to-End Workflow Demonstration
-
-### Workflow A: Customer Purchases a Subscription
-1. Visit `http://127.0.0.1:5000/products` or click **"Browse Software"**.
-2. Select **BrightBooks — Accounting Software** or **StaffTrack**.
-3. Choose a subscription plan (e.g., *Professional Yearly*).
-4. Click **"Subscribe Now"** to open `/checkout`.
-5. Enter promo code `LAUNCH25` (25% off) and select a simulated payment method (Credit Card, Bank Transfer, or UPI).
-6. Click **"Confirm & Complete Payment"**.
-7. The server recalculates totals, validates the promotion, processes the simulated payment, generates Invoice `#INV-...`, and sets the subscription to **Active**.
-8. View the new subscription in the **Customer Dashboard** (`/customer/subscriptions`).
-
-### Workflow B: Admin Configures a New Product & Plan
-1. Log in as `admin@memzo.com` with `Admin@Password123`.
-2. Navigate to **Products** (`/admin/products`) -> click **"Add New Product"**.
-3. Fill in product name, description, sales price, and publish status.
-4. Navigate to **Plans** (`/admin/plans`) -> click **"Create Plan"** to attach Monthly or Yearly billing cycles.
-5. The product immediately appears on the public catalog.
-
-### Workflow C: Staff Creates a Quotation & Records Payment
-1. Log in as `staff@memzo.com` with `Staff@Password123`.
-2. Go to **Quotations** (`/staff/quotations`) -> click **"New Quotation"**.
-3. Select a customer and add product line items with custom quantities.
-4. Mark quotation as **Sent** or **Accepted**.
-5. Once accepted, navigate to **Invoices** (`/staff/invoices`), select an unpaid invoice, click **"Record Payment"**, and enter partial or full amount.
-6. The invoice outstanding balance automatically adjusts; when paid in full, status transitions to **Paid**.
-
----
-
-## 7. Key Business Logic & Security Guarantees
-
-1. **Server-Side Validation:** All financial totals (subtotals, percentage & fixed discounts, taxes, balances) are calculated on the server using `Decimal` arithmetic. Browser-submitted prices are never trusted.
-2. **Access Control:** Enforced at the route decorator level (`@admin_required`, `@staff_required`, `@customer_required`). Customer route endpoints verify `customer_id == current_user.user_id` to prevent IDOR attacks.
-3. **Simulation Notice:** All payment processing in this prototype is explicitly handled via server-side simulation without external credit card gateways, ensuring safety and determinism.
-4. **Data Isolation:** Staff cannot create admin or other staff accounts; customers cannot view other customers' invoices or subscriptions.
+**Project Name:** MEMZO – Subscription Management System  
+**Backend:** Python Flask  
+**Database:** SQLite  
+**Project Type:** Web-Based Application  
+**Repository:** https://github.com/usanamika2006-dotcom/Memzo
