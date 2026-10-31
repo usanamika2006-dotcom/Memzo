@@ -1,0 +1,76 @@
+{% extends "admin/admin_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}Discounts & Promotions — MEMZO Admin{% endblock %}
+{% block page_title %}Discount & Promotion Rules{% endblock %}
+
+{% block content %}
+<div class="content-card">
+  <div class="content-card-header">
+    <div>
+      <h3 class="content-card-title">Promotional Discount Engine</h3>
+      <p style="font-size: 13px; color: var(--color-text-secondary); margin-top: 4px;">
+        Define percentage and fixed discount coupons with usage caps, date thresholds, and basket minimums.
+      </p>
+    </div>
+    <a href="{{ url_for('admin.discount_add') }}" class="btn-lime">
+      + Create Promo Discount
+    </a>
+  </div>
+
+  <div class="table-responsive-custom">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>Coupon Code</th>
+          <th>Type</th>
+          <th>Discount Value</th>
+          <th>Min Purchase</th>
+          <th>Usage / Limit</th>
+          <th>Validity Period</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if discounts %}
+          {% for d in discounts %}
+            <tr>
+              <td><code>{{ d.discount_name }}</code></td>
+              <td>{{ d.discount_type }}</td>
+              <td>
+                <strong style="color: #0c6943;">
+                  {% if d.discount_type == 'Percentage' %}{{ d.discount_value }}%{% else %}${{ d.discount_value }}{% endif %}
+                </strong>
+              </td>
+              <td>${{ d.minimum_purchase }}</td>
+              <td>
+                {{ d.used_count }} / {{ d.usage_limit or 'Unlimited' }}
+              </td>
+              <td style="font-size: 12px; color: var(--color-text-secondary);">
+                {{ d.start_date.strftime('%b %d, %Y') if d.start_date else 'Immediate' }} &rarr;
+                {{ d.end_date.strftime('%b %d, %Y') if d.end_date else 'Indefinite' }}
+              </td>
+              <td>{{ badge.render_badge('Active' if d.is_active else 'Closed') }}</td>
+              <td>
+                <form method="POST" action="{{ url_for('admin.discount_toggle', discount_id=d.discount_id) }}" style="display: inline;">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  <button type="submit" class="btn-table-action" style="color: {% if d.is_active %}#b91c1c{% else %}#0c6943{% endif %};">
+                    {{ 'Deactivate' if d.is_active else 'Activate' }}
+                  </button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="8" style="text-align: center; color: var(--color-text-secondary); padding: 40px;">
+              No discount rules configured yet. Click "+ Create Promo Discount" to add one.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

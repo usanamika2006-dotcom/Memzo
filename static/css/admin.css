@@ -1,0 +1,63 @@
+/* ==========================================================================
+   MEMZO ADMIN SPECIFIC STYLES (admin.css)
+   ========================================================================== */
+
+.admin-chart-container {
+  position: relative;
+  height: 320px;
+  width: 100%;
+}
+
+.admin-grid-2col {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+@media (min-width: 992px) {
+  .admin-grid-2col {
+    grid-template-columns: 1.6fr 1fr;
+  }
+}
+
+.invoice-summary-box {
+  background-color: #fafbf9;
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  padding: 20px;
+  margin-top: 20px;
+}
+
+.summary-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  font-size: 14px;
+}
+
+.summary-row.total {
+  border-top: 2px solid var(--color-deep-teal);
+  margin-top: 10px;
+  padding-top: 12px;
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--color-deep-teal);
+}
+
+.invoice-print-view {
+  background: white;
+  padding: 40px;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border-light);
+  max-width: 860px;
+  margin: 0 auto;
+}
+
+.invoice-brand-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 2px solid var(--color-deep-teal);
+}

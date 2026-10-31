@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" width="240" height="60" fill="none">
+  <!-- Modern Geometric Loop Symbol -->
+  <defs>
+    <linearGradient id="memzoGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#91E8C1" />
+      <stop offset="100%" stop-color="#C9FF82" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#91E8C1" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  <g transform="translate(4, 8)">
+    <!-- Connected geometric nodes for subscription cycle -->
+    <path d="M12 36 C4 36 2 28 8 20 C14 12 24 10 32 18 C38 24 40 32 34 38 C30 42 22 42 16 38" 
+          stroke="url(#memzoGrad)" stroke-width="4.5" stroke-linecap="round" fill="none" filter="url(#glow)"/>
+    <circle cx="22" cy="22" r="5" fill="#C9FF82" />
+    <circle cx="34" cy="18" r="3" fill="#91E8C1" />
+  </g>
+  <!-- Typography -->
+  <text x="56" y="38" font-family="'Plus Jakarta Sans', 'Inter', -apple-system, sans-serif" font-size="28" font-weight="800" letter-spacing="1.5" fill="#FFFFFF">
+    MEM<tspan fill="#C9FF82">Z</tspan>O
+  </text>
+</svg>

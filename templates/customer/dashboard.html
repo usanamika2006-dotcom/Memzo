@@ -1,0 +1,188 @@
+{% extends "customer/customer_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}My Dashboard — MEMZO Customer Portal{% endblock %}
+{% block page_title %}Account Overview{% endblock %}
+
+{% block content %}
+<!-- Welcome Banner -->
+<div class="customer-welcome-banner">
+  <div class="customer-welcome-text">
+    <h2>Welcome, {{ current_user.name }}</h2>
+    <p>
+      Manage your active software subscriptions, view billing statements, and handle renewals in one place.
+    </p>
+  </div>
+  <div>
+    <a href="{{ url_for('public.products') }}" class="btn-lime">
+      + Subscribe to New Product
+    </a>
+  </div>
+</div>
+
+<!-- Upcoming Renewals Alert (if any) -->
+{% if metrics.upcoming_renewals %}
+  {% for r in metrics.upcoming_renewals %}
+    <div class="renewal-alert-card">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-size: 20px;">⚠️</span>
+        <div>
+          <strong>Upcoming Renewal Notice:</strong> Your subscription for <strong>{{ r.plan.product.product_name }}</strong> expires on {{ r.expiry_date.strftime('%B %d, %Y') }}.
+        </div>
+      </div>
+      <form method="POST" action="{{ url_for('customer.subscription_renew', subscription_id=r.subscription_id) }}" style="display: inline;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="btn-lime" style="padding: 6px 16px; font-size: 13px;">Renew Subscription</button>
+      </form>
+    </div>
+  {% endfor %}
+{% endif %}
+
+<!-- Metrics Grid -->
+<div class="metrics-grid">
+  <div class="metric-card">
+    <div class="metric-card-title">Active Subscriptions</div>
+    <div class="metric-card-val" style="color: #0c6943;">{{ metrics.active_subscriptions_count }}</div>
+    <div class="metric-card-meta">Live enterprise licenses</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-card-title">Pending Invoices</div>
+    <div class="metric-card-val" style="color: #b45309;">{{ metrics.pending_invoices_count }}</div>
+    <div class="metric-card-meta">Awaiting payment settlement</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-card-title">Total Invested</div>
+    <div class="metric-card-val" style="color: var(--color-deep-teal);">${{ "%.2f"|format(metrics.total_spent) }}</div>
+    <div class="metric-card-meta">Settled transactions to date</div>
+  </div>
+</div>
+
+<!-- Active Subscriptions Cards -->
+<div class="content-card">
+  <div class="content-card-header">
+    <h3 class="content-card-title">My Active Subscriptions</h3>
+    <a href="{{ url_for('customer.subscriptions') }}" class="btn-table-action">View All ({{ metrics.total_subscriptions_count }}) &rarr;</a>
+  </div>
+
+  {% if metrics.active_subs %}
+    <div class="subscription-card-grid">
+      {% for s in metrics.active_subs %}
+        <div class="sub-active-card">
+          <div>
+            <div class="sub-card-top">
+              <div>
+                <h4 class="sub-prod-name">{{ s.plan.product.product_name }}</h4>
+                <span class="sub-plan-badge">{{ s.plan.plan_name }}</span>
+              </div>
+              {{ badge.render_badge(s.status) }}
+            </div>
+
+            <ul class="sub-meta-list">
+              <li><span>Billing Cycle:</span> <strong>{{ s.plan.billing_cycle }}</strong></li>
+              <li><span>Expiry Date:</span> <strong>{{ s.expiry_date.strftime('%b %d, %Y') }}</strong></li>
+              <li><span>Seats Allocated:</span> <strong>{{ s.items[0].quantity if s.items else 1 }} seat(s)</strong></li>
+              <li><span>Cycle Price:</span> <strong>${{ "%.2f"|format(s.total_amount) }}</strong></li>
+            </ul>
+          </div>
+
+          <div class="sub-card-actions">
+            <a href="{{ url_for('customer.subscription_detail', subscription_id=s.subscription_id) }}" class="btn-table-action">
+              Details
+            </a>
+            {% if s.plan.allow_renew %}
+              <form method="POST" action="{{ url_for('customer.subscription_renew', subscription_id=s.subscription_id) }}" style="display: inline;">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn-lime" style="padding: 6px 14px; font-size: 12px;">Renew</button>
+              </form>
+            {% endif %}
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div style="text-align: center; padding: 40px; color: var(--color-text-secondary);">
+      <p style="margin-bottom: 16px;">You do not currently have any active software subscriptions.</p>
+      <a href="{{ url_for('public.products') }}" class="btn-lime">Browse Software Catalogue</a>
+    </div>
+  {% endif %}
+</div>
+
+<!-- Recent Invoices & Payments Split -->
+<div class="row">
+  <div class="col-lg-6">
+    <div class="content-card">
+      <div class="content-card-header">
+        <h3 class="content-card-title">Recent Invoices</h3>
+        <a href="{{ url_for('customer.invoices') }}" class="btn-table-action">All Invoices &rarr;</a>
+      </div>
+      <div class="table-responsive-custom">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th>Invoice #</th>
+              <th>Due Date</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if metrics.recent_invoices %}
+              {% for inv in metrics.recent_invoices %}
+                <tr>
+                  <td>
+                    <a href="{{ url_for('customer.invoice_detail', invoice_id=inv.invoice_id) }}" style="color: var(--color-deep-teal); font-weight: 700; text-decoration: none;">
+                      {{ inv.invoice_number }}
+                    </a>
+                  </td>
+                  <td>{{ inv.due_date.strftime('%b %d, %Y') }}</td>
+                  <td><strong>${{ "%.2f"|format(inv.total_amount) }}</strong></td>
+                  <td>{{ badge.render_badge(inv.status) }}</td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr><td colspan="4" style="text-align: center; color: var(--color-text-secondary);">No invoices yet.</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="content-card">
+      <div class="content-card-header">
+        <h3 class="content-card-title">Recent Payments</h3>
+        <a href="{{ url_for('customer.payments') }}" class="btn-table-action">History &rarr;</a>
+      </div>
+      <div class="table-responsive-custom">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th>Reference</th>
+              <th>Amount</th>
+              <th>Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if metrics.recent_payments %}
+              {% for p in metrics.recent_payments %}
+                <tr>
+                  <td><code>{{ p.transaction_reference }}</code></td>
+                  <td><strong style="color: #0c6943;">${{ "%.2f"|format(p.amount) }}</strong></td>
+                  <td>{{ p.payment_date.strftime('%b %d, %Y') }}</td>
+                  <td>{{ badge.render_badge(p.status) }}</td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr><td colspan="4" style="text-align: center; color: var(--color-text-secondary);">No payments yet.</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

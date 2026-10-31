@@ -1,0 +1,154 @@
+{% extends "admin/admin_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}Subscription {{ subscription.subscription_number }} — MEMZO Admin{% endblock %}
+{% block page_title %}Subscription Lifecycle Details{% endblock %}
+
+{% block content %}
+<div class="content-card">
+  <div class="content-card-header">
+    <div>
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
+        <h3 class="content-card-title" style="margin-bottom: 0;">{{ subscription.subscription_number }}</h3>
+        {{ badge.render_badge(subscription.status) }}
+      </div>
+      <p style="font-size: 13px; color: var(--color-text-secondary);">
+        Customer: <strong>{{ subscription.customer.name }}</strong> ({{ subscription.customer.email }})
+      </p>
+    </div>
+    <a href="{{ url_for('admin.subscriptions') }}" class="btn-table-action">&larr; Back to Subscriptions</a>
+  </div>
+
+  <div class="row" style="margin-top: 16px;">
+    <!-- Overview Details -->
+    <div class="col-md-6">
+      <div style="background: #fafbf9; border-radius: var(--radius-md); border: 1px solid var(--color-border-light); padding: 20px;">
+        <h4 style="font-size: 15px; font-weight: 800; color: var(--color-text-main); margin-bottom: 14px;">Plan & Schedule</h4>
+        
+        <div style="display: grid; gap: 10px; font-size: 14px;">
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--color-text-secondary);">Software Product:</span>
+            <strong>{{ subscription.plan.product.product_name }}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--color-text-secondary);">Subscription Plan:</span>
+            <strong>{{ subscription.plan.plan_name }}</strong>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--color-text-secondary);">Billing Cycle:</span>
+            <span>{{ subscription.plan.billing_cycle }}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--color-text-secondary);">Start Date:</span>
+            <span>{{ subscription.start_date.strftime('%B %d, %Y') }}</span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--color-text-secondary);">Expiry Date:</span>
+            <span {% if subscription.is_expired and subscription.status == 'Active' %}style="color: #ef4444; font-weight: 800;"{% endif %}>
+              {{ subscription.expiry_date.strftime('%B %d, %Y') }}
+            </span>
+          </div>
+          <div style="display: flex; justify-content: space-between;">
+            <span style="color: var(--color-text-secondary);">Payment Terms:</span>
+            <span>{{ subscription.payment_terms }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status Change & Administrative Action -->
+    <div class="col-md-6">
+      <div style="background: #fafbf9; border-radius: var(--radius-md); border: 1px solid var(--color-border-light); padding: 20px;">
+        <h4 style="font-size: 15px; font-weight: 800; color: var(--color-text-main); margin-bottom: 14px;">Lifecycle Controls</h4>
+
+        <form method="POST" action="{{ url_for('admin.subscription_update_status', subscription_id=subscription.subscription_id) }}">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+          <div class="form-group">
+            <label class="form-label" for="status">Transition Status</label>
+            <select name="status" id="status" class="form-control-custom">
+              <option value="Active" {% if subscription.status == 'Active' %}selected{% endif %}>Active</option>
+              <option value="Confirmed" {% if subscription.status == 'Confirmed' %}selected{% endif %}>Confirmed</option>
+              <option value="Draft" {% if subscription.status == 'Draft' %}selected{% endif %}>Draft</option>
+              <option value="Closed" {% if subscription.status == 'Closed' %}selected{% endif %}>Closed</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn-dark" style="width: 100%; padding: 10px;">
+            Update Status
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Items Breakdown -->
+  <div style="margin-top: 32px;">
+    <h4 style="font-size: 16px; font-weight: 800; color: var(--color-text-main); margin-bottom: 16px;">Subscription Items & Seats</h4>
+    
+    <div class="table-responsive-custom">
+      <table class="table-custom">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Edition / Variant</th>
+            <th>Seats / Qty</th>
+            <th>Unit Price</th>
+            <th>Line Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in subscription.items %}
+            <tr>
+              <td><strong>{{ item.product.product_name }}</strong></td>
+              <td>{{ item.variant.variant_name if item.variant else 'Standard Edition' }}</td>
+              <td>{{ item.quantity }} license(s)</td>
+              <td>${{ "%.2f"|format(item.unit_price) }}</td>
+              <td><strong style="color: var(--color-deep-teal);">${{ "%.2f"|format(item.total_amount) }}</strong></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Associated Invoices -->
+  <div style="margin-top: 32px;">
+    <h4 style="font-size: 16px; font-weight: 800; color: var(--color-text-main); margin-bottom: 16px;">Associated Billing Invoices</h4>
+    <div class="table-responsive-custom">
+      <table class="table-custom">
+        <thead>
+          <tr>
+            <th>Invoice #</th>
+            <th>Date</th>
+            <th>Due Date</th>
+            <th>Total Amount</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if subscription.invoices %}
+            {% for inv in subscription.invoices %}
+              <tr>
+                <td><code>{{ inv.invoice_number }}</code></td>
+                <td>{{ inv.invoice_date.strftime('%b %d, %Y') }}</td>
+                <td>{{ inv.due_date.strftime('%b %d, %Y') }}</td>
+                <td><strong>${{ "%.2f"|format(inv.total_amount) }}</strong></td>
+                <td>{{ badge.render_badge(inv.status) }}</td>
+                <td>
+                  <a href="{{ url_for('admin.invoice_detail', invoice_id=inv.invoice_id) }}" class="btn-table-action">
+                    Open Invoice &rarr;
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="6" style="text-align: center; color: var(--color-text-secondary);">No associated invoices generated.</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

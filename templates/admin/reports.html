@@ -1,0 +1,105 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Financial Reports & Intelligence — MEMZO Admin{% endblock %}
+{% block page_title %}Financial Reports & Analytics{% endblock %}
+
+{% block content %}
+<!-- Top Metrics Summary -->
+<div class="metrics-grid">
+  <div class="metric-card">
+    <div class="metric-card-title">Settled Revenue</div>
+    <div class="metric-card-val" style="color: #0c6943;">${{ "%.2f"|format(metrics.total_revenue) }}</div>
+    <div class="metric-card-meta">Lifetime captured receipts</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-card-title">Pending Balances</div>
+    <div class="metric-card-val" style="color: #b45309;">${{ "%.2f"|format(metrics.pending_revenue) }}</div>
+    <div class="metric-card-meta">{{ metrics.pending_invoices_count }} invoices awaiting payment</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-card-title">Overdue Invoices</div>
+    <div class="metric-card-val" style="color: #b91c1c;">{{ metrics.overdue_invoices_count }}</div>
+    <div class="metric-card-meta">Invoices past their due date</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-card-title">Active Subscriptions</div>
+    <div class="metric-card-val">{{ metrics.active_subscriptions }}</div>
+    <div class="metric-card-meta">Current recurring accounts</div>
+  </div>
+</div>
+
+<div class="admin-grid-2col" style="margin-bottom: 32px;">
+  <div class="content-card">
+    <div class="content-card-header">
+      <h3 class="content-card-title">Revenue Trajectory (Monthly)</h3>
+    </div>
+    <div class="admin-chart-container">
+      <canvas id="reportRevenueChart"></canvas>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <div class="content-card-header">
+      <h3 class="content-card-title">Subscription Health Distribution</h3>
+    </div>
+    <div class="admin-chart-container" style="height: 280px;">
+      <canvas id="reportStatusChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<div class="content-card">
+  <h3 class="content-card-title" style="margin-bottom: 16px;">Financial KPI Summary</h3>
+  
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+    <div style="background: #fafbf9; border-radius: var(--radius-md); padding: 20px; border: 1px solid var(--color-border-light);">
+      <div style="font-size: 13px; font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase;">Average Revenue Per User (ARPU)</div>
+      <div style="font-size: 26px; font-weight: 800; color: var(--color-deep-teal); margin: 6px 0;">
+        {% if metrics.total_customers > 0 %}
+          ${{ "%.2f"|format(metrics.total_revenue / metrics.total_customers) }}
+        {% else %}
+          $0.00
+        {% endif %}
+      </div>
+      <div style="font-size: 12px; color: var(--color-text-secondary);">Calculated across active accounts</div>
+    </div>
+
+    <div style="background: #fafbf9; border-radius: var(--radius-md); padding: 20px; border: 1px solid var(--color-border-light);">
+      <div style="font-size: 13px; font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase;">Collection Efficiency Rate</div>
+      <div style="font-size: 26px; font-weight: 800; color: #0c6943; margin: 6px 0;">
+        {% set total_billed = metrics.total_revenue + metrics.pending_revenue %}
+        {% if total_billed > 0 %}
+          {{ "%.1f"|format((metrics.total_revenue / total_billed) * 100) }}%
+        {% else %}
+          100%
+        {% endif %}
+      </div>
+      <div style="font-size: 12px; color: var(--color-text-secondary);">Settled vs Outstanding ratio</div>
+    </div>
+
+    <div style="background: #fafbf9; border-radius: var(--radius-md); padding: 20px; border: 1px solid var(--color-border-light);">
+      <div style="font-size: 13px; font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase;">Total Subscriptions Managed</div>
+      <div style="font-size: 26px; font-weight: 800; color: var(--color-deep-teal); margin: 6px 0;">
+        {{ metrics.total_subscriptions }}
+      </div>
+      <div style="font-size: 12px; color: var(--color-text-secondary);">Active, confirmed, draft and closed</div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const monthlyLabels = {{ metrics.monthly_labels | tojson }};
+    const monthlyData = {{ metrics.monthly_data | tojson }};
+    const statusCounts = {{ metrics.status_counts | tojson }};
+
+    initRevenueChart('reportRevenueChart', monthlyLabels, monthlyData);
+    initStatusDoughnut('reportStatusChart', statusCounts);
+  });
+</script>
+{% endblock %}

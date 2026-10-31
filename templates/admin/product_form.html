@@ -1,0 +1,102 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}{{ title }} — MEMZO Admin{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="content-card" style="max-width: 820px; margin: 0 auto;">
+  <div class="content-card-header">
+    <div>
+      <h3 class="content-card-title">{{ title }}</h3>
+      <p style="font-size: 13px; color: var(--color-text-secondary); margin-top: 4px;">
+        Define product specifications, subscription pricing, notes, and storefront visibility.
+      </p>
+    </div>
+    <a href="{{ url_for('admin.products') }}" class="btn-table-action">&larr; Back to Products</a>
+  </div>
+
+  <form method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+
+    <div class="form-group">
+      <label class="form-label" for="product_name">{{ form.product_name.label }}</label>
+      {{ form.product_name(class="form-control-custom", placeholder="e.g. BrightBooks Accounting", id="product_name") }}
+      {% for error in form.product_name.errors %}
+        <span class="form-error">{{ error }}</span>
+      {% endfor %}
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-label" for="product_type">{{ form.product_type.label }}</label>
+          {{ form.product_type(class="form-control-custom", id="product_type") }}
+          {% for error in form.product_type.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-label" for="sales_price">{{ form.sales_price.label }}</label>
+          {{ form.sales_price(class="form-control-custom", placeholder="29.00", id="sales_price") }}
+          {% for error in form.sales_price.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-label" for="cost_price">{{ form.cost_price.label }}</label>
+          {{ form.cost_price(class="form-control-custom", placeholder="0.00", id="cost_price") }}
+          {% for error in form.cost_price.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-label" for="image">{{ form.image.label }}</label>
+          {{ form.image(class="form-control-custom", id="image") }}
+          {% for error in form.image.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="description">{{ form.description.label }}</label>
+      {{ form.description(class="form-control-custom", rows="4", placeholder="Full customer-facing description of software features and value proposition...", id="description") }}
+      {% for error in form.description.errors %}
+        <span class="form-error">{{ error }}</span>
+      {% endfor %}
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="notes">{{ form.notes.label }}</label>
+      {{ form.notes(class="form-control-custom", rows="2", placeholder="Internal staff notes, technical stack, licensing constraints...", id="notes") }}
+      {% for error in form.notes.errors %}
+        <span class="form-error">{{ error }}</span>
+      {% endfor %}
+    </div>
+
+    <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+      {{ form.is_published(id="is_published", style="accent-color: #062722; width: 18px; height: 18px;") }}
+      <label for="is_published" style="font-size: 14px; font-weight: 600; cursor: pointer; user-select: none;">
+        Publish immediately to public storefront catalogue
+      </label>
+    </div>
+
+    <div style="margin-top: 32px; display: flex; gap: 12px;">
+      {{ form.submit(class="btn-lime", style="padding: 12px 28px;") }}
+      <a href="{{ url_for('admin.products') }}" class="btn-dark" style="background-color: #64748b;">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

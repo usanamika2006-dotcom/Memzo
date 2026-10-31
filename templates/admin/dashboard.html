@@ -1,0 +1,167 @@
+{% extends "admin/admin_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}Admin Dashboard — MEMZO{% endblock %}
+{% block page_title %}Executive Business Overview{% endblock %}
+
+{% block content %}
+<!-- Metrics Top Cards -->
+<div class="metrics-grid">
+  <div class="metric-card">
+    <div class="metric-card-top">
+      <span class="metric-card-title">Total Active Customers</span>
+      <div class="metric-card-icon">
+        <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      </div>
+    </div>
+    <div class="metric-card-val">{{ metrics.total_customers }}</div>
+    <div class="metric-card-meta">Registered verified businesses</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-card-top">
+      <span class="metric-card-title">Active Subscriptions</span>
+      <div class="metric-card-icon" style="background-color: #e5fbf0; color: #0c6943;">
+        <svg viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"></path></svg>
+      </div>
+    </div>
+    <div class="metric-card-val">{{ metrics.active_subscriptions }}</div>
+    <div class="metric-card-meta">Out of {{ metrics.total_subscriptions }} total created</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-card-top">
+      <span class="metric-card-title">Total Settled Revenue</span>
+      <div class="metric-card-icon" style="background-color: #f0fdf4; color: #16a34a;">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 14 14"></polyline></svg>
+      </div>
+    </div>
+    <div class="metric-card-val">${{ "%.2f"|format(metrics.total_revenue) }}</div>
+    <div class="metric-card-meta">Calculated strictly from successful settlements</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-card-top">
+      <span class="metric-card-title">Pending Invoices</span>
+      <div class="metric-card-icon" style="background-color: #fef3c7; color: #b45309;">
+        <svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="18" rx="2"></rect><line x1="2" y1="9" x2="22" y2="9"></line><line x1="7" y1="14" x2="17" y2="14"></line></svg>
+      </div>
+    </div>
+    <div class="metric-card-val">{{ metrics.pending_invoices_count }}</div>
+    <div class="metric-card-meta">${{ "%.2f"|format(metrics.pending_revenue) }} outstanding balance</div>
+  </div>
+</div>
+
+<!-- Charts Section -->
+<div class="admin-grid-2col" style="margin-bottom: 32px;">
+  <div class="content-card">
+    <div class="content-card-header">
+      <h3 class="content-card-title">Monthly Revenue Trend (USD)</h3>
+      <span style="font-size: 12px; color: var(--color-text-secondary); font-weight: 600;">Past 6 Months</span>
+    </div>
+    <div class="admin-chart-container">
+      <canvas id="revenueTrendChart"></canvas>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <div class="content-card-header">
+      <h3 class="content-card-title">Subscription Status Breakdown</h3>
+    </div>
+    <div class="admin-chart-container" style="height: 280px;">
+      <canvas id="statusBreakdownChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- Recent Records Split -->
+<div class="admin-grid-2col">
+  <!-- Recent Payments -->
+  <div class="content-card">
+    <div class="content-card-header">
+      <h3 class="content-card-title">Recent Settlements</h3>
+      <a href="{{ url_for('admin.payments') }}" class="btn-table-action">View All Payments &rarr;</a>
+    </div>
+    <div class="table-responsive-custom">
+      <table class="table-custom">
+        <thead>
+          <tr>
+            <th>Reference</th>
+            <th>Customer</th>
+            <th>Amount</th>
+            <th>Date</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if metrics.recent_payments %}
+            {% for p in metrics.recent_payments %}
+              <tr>
+                <td><code>{{ p.transaction_reference }}</code></td>
+                <td><strong>{{ p.customer.name }}</strong></td>
+                <td><strong style="color: #0c6943;">${{ "%.2f"|format(p.amount) }}</strong></td>
+                <td>{{ p.payment_date.strftime('%b %d, %Y') }}</td>
+                <td>{{ badge.render_badge(p.status) }}</td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="5" style="text-align: center; color: var(--color-text-secondary);">No recorded payments yet.</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Recent Subscriptions -->
+  <div class="content-card">
+    <div class="content-card-header">
+      <h3 class="content-card-title">Recent Subscriptions</h3>
+      <a href="{{ url_for('admin.subscriptions') }}" class="btn-table-action">View All Subscriptions &rarr;</a>
+    </div>
+    <div class="table-responsive-custom">
+      <table class="table-custom">
+        <thead>
+          <tr>
+            <th>Number</th>
+            <th>Plan</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if metrics.recent_subscriptions %}
+            {% for s in metrics.recent_subscriptions %}
+              <tr>
+                <td>
+                  <a href="{{ url_for('admin.subscription_detail', subscription_id=s.subscription_id) }}" style="color: var(--color-deep-teal); font-weight: 700; text-decoration: none;">
+                    {{ s.subscription_number }}
+                  </a>
+                </td>
+                <td>
+                  <div><strong>{{ s.plan.product.product_name }}</strong></div>
+                  <div style="font-size: 11px; color: var(--color-text-secondary);">{{ s.plan.plan_name }}</div>
+                </td>
+                <td>{{ badge.render_badge(s.status) }}</td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="3" style="text-align: center; color: var(--color-text-secondary);">No subscriptions yet.</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const monthlyLabels = {{ metrics.monthly_labels | tojson }};
+    const monthlyData = {{ metrics.monthly_data | tojson }};
+    const statusCounts = {{ metrics.status_counts | tojson }};
+
+    initRevenueChart('revenueTrendChart', monthlyLabels, monthlyData);
+    initStatusDoughnut('statusBreakdownChart', statusCounts);
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}{{ product.product_name }} — MEMZO Software{% endblock %}
+
+{% block content %}
+<div style="background-color: var(--color-deep-teal); padding: 48px 32px 64px;">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    <div style="margin-bottom: 20px;">
+      <a href="{{ url_for('public.products') }}" style="color: var(--color-mint-green); font-size: 13px; font-weight: 600; text-decoration: none;">&larr; Back to Catalogue</a>
+    </div>
+
+    <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 16px;">
+      <span style="background: rgba(145, 232, 193, 0.2); color: var(--color-mint-green); font-size: 11px; font-weight: 800; padding: 4px 12px; border-radius: var(--radius-full); text-transform: uppercase;">
+        {{ product.product_type }}
+      </span>
+      <span style="color: #8daea0; font-size: 13px;">Enterprise Verified</span>
+    </div>
+
+    <h1 style="color: var(--color-mint-green); font-size: clamp(34px, 4vw, 52px); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 16px;">
+      {{ product.product_name }}
+    </h1>
+
+    <p style="color: #c7ded5; font-size: 17px; line-height: 1.6; max-width: 780px;">
+      {{ product.description }}
+    </p>
+  </div>
+</div>
+
+<div style="padding: 60px 32px; background-color: var(--color-white);">
+  <div style="max-width: 1100px; margin: 0 auto;">
+    
+    <!-- Available Plans Grid -->
+    <div style="margin-bottom: 60px;">
+      <h2 style="font-size: 26px; font-weight: 800; color: var(--color-text-main); margin-bottom: 24px; letter-spacing: -0.01em;">
+        Select Subscription Plan
+      </h2>
+
+      {% if plans %}
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px;">
+          {% for plan in plans %}
+            <div style="background: white; border-radius: var(--radius-lg); border: 2px solid {% if loop.first %}var(--color-deep-teal){% else %}var(--color-border-light){% endif %}; padding: 28px; display: flex; flex-direction: column; justify-content: space-between; position: relative;">
+              {% if loop.first %}
+                <div style="position: absolute; top: -12px; right: 24px; background: var(--color-lime-green); color: var(--color-deep-teal); font-size: 11px; font-weight: 800; padding: 3px 12px; border-radius: var(--radius-full); text-transform: uppercase;">
+                  Most Popular
+                </div>
+              {% endif %}
+
+              <div>
+                <div style="font-size: 13px; font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase; margin-bottom: 8px;">
+                  {{ plan.billing_cycle }} Cycle
+                </div>
+                <h3 style="font-size: 22px; font-weight: 800; color: var(--color-text-main); margin-bottom: 12px;">
+                  {{ plan.plan_name }}
+                </h3>
+
+                <div style="font-size: 36px; font-weight: 800; color: var(--color-deep-teal); margin-bottom: 20px;">
+                  ${{ plan.price }}<span style="font-size: 14px; font-weight: 500; color: var(--color-text-secondary);">/{{ plan.billing_cycle | lower }}</span>
+                </div>
+
+                <ul style="list-style: none; font-size: 14px; color: var(--color-text-secondary); display: flex; flex-direction: column; gap: 10px; margin-bottom: 28px;">
+                  <li style="display: flex; align-items: center; gap: 8px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0c6943" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    Min Seats: <strong>{{ plan.minimum_quantity }} license(s)</strong>
+                  </li>
+                  <li style="display: flex; align-items: center; gap: 8px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0c6943" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    Self Renewal: <strong>{{ 'Permitted' if plan.allow_renew else 'Managed' }}</strong>
+                  </li>
+                  <li style="display: flex; align-items: center; gap: 8px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0c6943" stroke-width="3"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                    Early Close: <strong>{{ 'Supported' if plan.allow_early_close else 'Term Bound' }}</strong>
+                  </li>
+                </ul>
+              </div>
+
+              <a href="{{ url_for('public.checkout', plan_id=plan.plan_id) }}" class="btn-lime" style="width: 100%; padding: 12px; font-size: 15px;">
+                Proceed to Checkout &rarr;
+              </a>
+            </div>
+          {% endfor %}
+        </div>
+      {% else %}
+        <p style="color: var(--color-text-secondary);">No subscription plans are currently active for this product.</p>
+      {% endif %}
+    </div>
+
+    <!-- Product Editions / Variants Table -->
+    {% if variants %}
+      <div style="background-color: #fafbf9; border-radius: var(--radius-lg); border: 1px solid var(--color-border-light); padding: 32px;">
+        <h3 style="font-size: 20px; font-weight: 800; color: var(--color-text-main); margin-bottom: 16px;">
+          Available Product Editions & Addons
+        </h3>
+        <div class="table-responsive-custom">
+          <table class="table-custom">
+            <thead>
+              <tr>
+                <th>Edition / Variant</th>
+                <th>Additional Surcharge</th>
+                <th>Description</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for v in variants %}
+                <tr>
+                  <td><strong>{{ v.variant_name }}</strong></td>
+                  <td><span style="color: var(--color-deep-teal); font-weight: 700;">+${{ v.additional_price }}</span></td>
+                  <td>{{ v.description or 'Standard feature set included.' }}</td>
+                </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {% endif %}
+
+  </div>
+</div>
+{% endblock %}

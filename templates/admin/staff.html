@@ -1,0 +1,73 @@
+{% extends "admin/admin_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}Staff Management — MEMZO Admin{% endblock %}
+{% block page_title %}Internal Staff Accounts{% endblock %}
+
+{% block content %}
+<div class="content-card">
+  <div class="content-card-header">
+    <div>
+      <h3 class="content-card-title">Operations Staff Team</h3>
+      <p style="font-size: 13px; color: var(--color-text-secondary); margin-top: 4px;">
+        Staff members have access to operational dashboards, quotations, customer records, and payment recording.
+      </p>
+    </div>
+    <a href="{{ url_for('admin.staff_add') }}" class="btn-lime">
+      + Add Staff Member
+    </a>
+  </div>
+
+  <div class="table-responsive-custom">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>Staff Member</th>
+          <th>Email Address</th>
+          <th>Phone</th>
+          <th>Created Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if staff_members %}
+          {% for s in staff_members %}
+            <tr>
+              <td>
+                <div style="font-weight: 800; color: var(--color-text-main);">{{ s.name }}</div>
+                <div style="font-size: 11px; color: var(--color-text-secondary);">User ID: #{{ s.user_id }}</div>
+              </td>
+              <td><code>{{ s.email }}</code></td>
+              <td>{{ s.phone or '—' }}</td>
+              <td>{{ s.created_at.strftime('%b %d, %Y') }}</td>
+              <td>
+                {{ badge.render_badge('Active' if s.is_active else 'Closed') }}
+              </td>
+              <td>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <a href="{{ url_for('admin.staff_edit', user_id=s.user_id) }}" class="btn-table-action">
+                    Edit
+                  </a>
+                  <form method="POST" action="{{ url_for('admin.staff_toggle', user_id=s.user_id) }}" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn-table-action" style="color: {% if s.is_active %}#b91c1c{% else %}#0c6943{% endif %};">
+                      {{ 'Suspend' if s.is_active else 'Activate' }}
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="6" style="text-align: center; color: var(--color-text-secondary); padding: 40px;">
+              No staff accounts created yet. Click "+ Add Staff Member" to add operations staff.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

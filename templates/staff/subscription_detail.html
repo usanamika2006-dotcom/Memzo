@@ -1,0 +1,56 @@
+{% extends "staff/staff_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}Subscription {{ subscription.subscription_number }} — MEMZO Staff{% endblock %}
+{% block page_title %}Subscription Information{% endblock %}
+
+{% block content %}
+<div class="content-card">
+  <div class="content-card-header">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <h3 class="content-card-title" style="margin-bottom: 0;">{{ subscription.subscription_number }}</h3>
+      {{ badge.render_badge(subscription.status) }}
+    </div>
+    <a href="{{ url_for('staff.subscriptions') }}" class="btn-table-action">&larr; Back to Subscriptions</a>
+  </div>
+
+  <div class="row" style="margin-top: 16px;">
+    <div class="col-md-6">
+      <div style="background: #fafbf9; border-radius: var(--radius-md); border: 1px solid var(--color-border-light); padding: 20px; font-size: 14px; display: grid; gap: 10px;">
+        <div>Customer: <strong>{{ subscription.customer.name }}</strong> ({{ subscription.customer.email }})</div>
+        <div>Software: <strong>{{ subscription.plan.product.product_name }}</strong></div>
+        <div>Plan: <strong>{{ subscription.plan.plan_name }} (${{ subscription.plan.price }}/{{ subscription.plan.billing_cycle }})</strong></div>
+        <div>Start Date: {{ subscription.start_date.strftime('%B %d, %Y') }}</div>
+        <div>Expiry Date: {{ subscription.expiry_date.strftime('%B %d, %Y') }}</div>
+        <div>Payment Terms: {{ subscription.payment_terms }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: 28px;">
+    <h4 style="font-size: 16px; font-weight: 800; color: var(--color-text-main); margin-bottom: 14px;">Licensed Items</h4>
+    <div class="table-responsive-custom">
+      <table class="table-custom">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Seats / Quantity</th>
+            <th>Unit Price</th>
+            <th>Total Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in subscription.items %}
+            <tr>
+              <td><strong>{{ item.product.product_name }}</strong></td>
+              <td>{{ item.quantity }}</td>
+              <td>${{ "%.2f"|format(item.unit_price) }}</td>
+              <td><strong style="color: var(--color-deep-teal);">${{ "%.2f"|format(item.total_amount) }}</strong></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

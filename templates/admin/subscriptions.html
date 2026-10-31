@@ -1,0 +1,85 @@
+{% extends "admin/admin_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}All Subscriptions — MEMZO Admin{% endblock %}
+{% block page_title %}Subscription Lifecycle Management{% endblock %}
+
+{% block content %}
+<div class="content-card">
+  <div class="content-card-header">
+    <div>
+      <h3 class="content-card-title">All Customer Subscriptions</h3>
+      <p style="font-size: 13px; color: var(--color-text-secondary); margin-top: 4px;">
+        Monitor live recurring plans, renewal countdowns, seat allocations, and status transitions.
+      </p>
+    </div>
+  </div>
+
+  <form method="GET" action="{{ url_for('admin.subscriptions') }}" class="filter-search-bar">
+    <select name="status" class="filter-input" onchange="this.form.submit();">
+      <option value="">All Subscription Statuses</option>
+      <option value="Active" {% if status_filter == 'Active' %}selected{% endif %}>Active</option>
+      <option value="Confirmed" {% if status_filter == 'Confirmed' %}selected{% endif %}>Confirmed</option>
+      <option value="Draft" {% if status_filter == 'Draft' %}selected{% endif %}>Draft</option>
+      <option value="Closed" {% if status_filter == 'Closed' %}selected{% endif %}>Closed</option>
+    </select>
+  </form>
+
+  <div class="table-responsive-custom">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>Subscription #</th>
+          <th>Customer</th>
+          <th>Product & Plan</th>
+          <th>Start Date</th>
+          <th>Expiry Date</th>
+          <th>Terms</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if subscriptions %}
+          {% for s in subscriptions %}
+            <tr>
+              <td>
+                <a href="{{ url_for('admin.subscription_detail', subscription_id=s.subscription_id) }}" style="font-weight: 700; color: var(--color-deep-teal); text-decoration: none;">
+                  {{ s.subscription_number }}
+                </a>
+              </td>
+              <td>
+                <strong>{{ s.customer.name }}</strong>
+                <div style="font-size: 11px; color: var(--color-text-secondary);">{{ s.customer.email }}</div>
+              </td>
+              <td>
+                <strong>{{ s.plan.product.product_name }}</strong>
+                <div style="font-size: 12px; color: var(--color-text-secondary);">{{ s.plan.plan_name }} (${{ s.plan.price }})</div>
+              </td>
+              <td>{{ s.start_date.strftime('%b %d, %Y') }}</td>
+              <td>
+                <span {% if s.is_expired and s.status == 'Active' %}style="color: #ef4444; font-weight: 700;"{% endif %}>
+                  {{ s.expiry_date.strftime('%b %d, %Y') }}
+                </span>
+              </td>
+              <td>{{ s.payment_terms }}</td>
+              <td>{{ badge.render_badge(s.status) }}</td>
+              <td>
+                <a href="{{ url_for('admin.subscription_detail', subscription_id=s.subscription_id) }}" class="btn-table-action">
+                  Manage &rarr;
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="8" style="text-align: center; color: var(--color-text-secondary); padding: 40px;">
+              No subscriptions match your filter.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

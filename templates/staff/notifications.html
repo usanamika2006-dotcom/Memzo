@@ -1,0 +1,38 @@
+{% extends "staff/staff_base.html" %}
+
+{% block title %}Notifications — MEMZO Staff{% endblock %}
+{% block page_title %}Notifications & Alerts{% endblock %}
+
+{% block content %}
+<div class="content-card" style="max-width: 800px;">
+  <div class="content-card-header">
+    <h3 class="content-card-title">Staff Activity & Alerts</h3>
+  </div>
+
+  {% if notifications %}
+    <div style="display: flex; flex-direction: column; gap: 12px;">
+      {% for n in notifications %}
+        <div style="background-color: {% if not n.is_read %}#f0fdf4{% else %}#fafbf9{% endif %}; border-left: 4px solid {% if not n.is_read %}var(--color-lime-green){% else %}#cbd5e1{% endif %}; padding: 16px 20px; border-radius: 0 var(--radius-md) var(--radius-md) 0; border: 1px solid var(--color-border-light); display: flex; justify-content: space-between; align-items: center;">
+          <div>
+            <div style="font-size: 14px; font-weight: {% if not n.is_read %}700{% else %}500{% endif %}; color: var(--color-text-main);">
+              {{ n.message }}
+            </div>
+            <div style="font-size: 12px; color: var(--color-text-secondary); margin-top: 4px;">
+              {{ n.created_at.strftime('%B %d, %Y - %H:%M') }}
+            </div>
+          </div>
+
+          {% if not n.is_read %}
+            <form method="POST" action="{{ url_for('staff.notification_read', notification_id=n.notification_id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn-table-action" style="font-size: 11px;">Mark Read</button>
+            </form>
+          {% endif %}
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p style="color: var(--color-text-secondary); text-align: center; padding: 40px;">No notifications at this time.</p>
+  {% endif %}
+</div>
+{% endblock %}

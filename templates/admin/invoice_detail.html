@@ -1,0 +1,201 @@
+{% extends "admin/admin_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}Invoice {{ invoice.invoice_number }} — MEMZO Admin{% endblock %}
+{% block page_title %}Invoice Details & Settlement{% endblock %}
+
+{% block content %}
+<div class="content-card">
+  <div class="content-card-header">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <h3 class="content-card-title" style="margin-bottom: 0;">{{ invoice.invoice_number }}</h3>
+      {{ badge.render_badge(invoice.status) }}
+      {% if invoice.is_overdue %}
+        <span class="status-pill status-closed">Overdue</span>
+      {% endif %}
+    </div>
+
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <a href="{{ url_for('admin.invoices') }}" class="btn-table-action">&larr; Back to Invoices</a>
+      <button onclick="window.print();" class="btn-table-action">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+        Print Invoice
+      </button>
+
+      {% if invoice.status == 'Draft' %}
+        <form method="POST" action="{{ url_for('admin.invoice_confirm_route', invoice_id=invoice.invoice_id) }}" style="display: inline;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn-lime" style="padding: 6px 16px; font-size: 13px;">
+            Confirm Invoice
+          </button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Printable Invoice Canvas -->
+  <div class="invoice-print-view" style="margin-top: 24px;">
+    <div class="invoice-brand-header">
+      <div>
+        <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="MEMZO" height="38" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/logo.png') }}';">
+        <div style="font-size: 13px; color: var(--color-text-secondary); margin-top: 8px;">
+          MEMZO Software Technologies Inc.<br>
+          billing@memzo.com • +1 (800) 555-MEMZO
+        </div>
+      </div>
+
+      <div style="text-align: right;">
+        <div style="font-size: 24px; font-weight: 800; color: var(--color-deep-teal);">TAX INVOICE</div>
+        <div style="font-size: 14px; font-weight: 700; color: var(--color-text-main); margin-top: 4px;">{{ invoice.invoice_number }}</div>
+        <div style="font-size: 13px; color: var(--color-text-secondary); margin-top: 4px;">
+          Date: {{ invoice.invoice_date.strftime('%B %d, %Y') }}<br>
+          Due: {{ invoice.due_date.strftime('%B %d, %Y') }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Bill To -->
+    <div style="margin-bottom: 28px; padding-bottom: 20px; border-bottom: 1px solid var(--color-border-light);">
+      <div style="font-size: 12px; font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase;">Billed To:</div>
+      <div style="font-size: 16px; font-weight: 800; color: var(--color-text-main); margin-top: 4px;">{{ invoice.customer.name }}</div>
+      <div style="font-size: 14px; color: var(--color-text-secondary);">
+        {{ invoice.customer.email }}<br>
+        Phone: {{ invoice.customer.phone or 'Not provided' }}
+      </div>
+    </div>
+
+    <!-- Items Table -->
+    <div class="table-responsive-custom">
+      <table class="table-custom">
+        <thead>
+          <tr>
+            <th>Product / Service</th>
+            <th>Quantity / Seats</th>
+            <th>Unit Price</th>
+            <th>Total Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in invoice.items %}
+            <tr>
+              <td><strong>{{ item.product.product_name }}</strong></td>
+              <td>{{ item.quantity }}</td>
+              <td>${{ "%.2f"|format(item.unit_price) }}</td>
+              <td><strong style="color: var(--color-deep-teal);">${{ "%.2f"|format(item.total_amount) }}</strong></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Financial Breakdown -->
+    <div class="invoice-summary-box" style="max-width: 380px; margin-left: auto;">
+      <div class="summary-row">
+        <span style="color: var(--color-text-secondary);">Subtotal:</span>
+        <span>${{ "%.2f"|format(invoice.subtotal) }}</span>
+      </div>
+
+      {% if invoice.discount_amount > 0 %}
+        <div class="summary-row" style="color: #0c6943;">
+          <span>Discount Applied:</span>
+          <span>-${{ "%.2f"|format(invoice.discount_amount) }}</span>
+        </div>
+      {% endif %}
+
+      <div class="summary-row">
+        <span style="color: var(--color-text-secondary);">Applicable Taxes:</span>
+        <span>${{ "%.2f"|format(invoice.tax_amount) }}</span>
+      </div>
+
+      <div class="summary-row total">
+        <span>Total Amount:</span>
+        <span>${{ "%.2f"|format(invoice.total_amount) }}</span>
+      </div>
+
+      <div class="summary-row" style="color: #0c6943; font-weight: 700;">
+        <span>Amount Settled:</span>
+        <span>${{ "%.2f"|format(invoice.amount_paid) }}</span>
+      </div>
+
+      <div class="summary-row" style="font-size: 16px; font-weight: 800; color: {% if invoice.outstanding_amount > 0 %}#b45309{% else %}#0c6943{% endif %}; border-top: 1px solid var(--color-border-light); padding-top: 8px;">
+        <span>Outstanding Balance:</span>
+        <span>${{ "%.2f"|format(invoice.outstanding_amount) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Record Payment Form (if not settled) -->
+  {% if invoice.outstanding_amount > 0 %}
+    <div style="margin-top: 36px; padding: 28px; background-color: #f7faf8; border-radius: var(--radius-lg); border: 1px solid var(--color-border-light);">
+      <h4 style="font-size: 16px; font-weight: 800; color: var(--color-text-main); margin-bottom: 16px;">
+        Record Payment Settlement
+      </h4>
+
+      <form method="POST" action="{{ url_for('admin.record_invoice_payment', invoice_id=invoice.invoice_id) }}">
+        {{ form.hidden_tag() }}
+
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-label" for="amount">{{ form.amount.label }}</label>
+              {{ form.amount(class="form-control-custom", id="amount", max=invoice.outstanding_amount) }}
+              <div class="form-helper">Max allowable: ${{ "%.2f"|format(invoice.outstanding_amount) }}</div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-label" for="payment_method">{{ form.payment_method.label }}</label>
+              {{ form.payment_method(class="form-control-custom", id="payment_method") }}
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-label" for="notes">{{ form.notes.label }}</label>
+              {{ form.notes(class="form-control-custom", placeholder="Reference / Notes", id="notes") }}
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-lime" style="padding: 10px 24px; font-weight: 700;">
+          Save Payment Record
+        </button>
+      </form>
+    </div>
+  {% endif %}
+
+  <!-- Payments on this Invoice -->
+  <div style="margin-top: 36px;">
+    <h4 style="font-size: 16px; font-weight: 800; color: var(--color-text-main); margin-bottom: 16px;">Payments History for this Invoice</h4>
+    <div class="table-responsive-custom">
+      <table class="table-custom">
+        <thead>
+          <tr>
+            <th>Reference</th>
+            <th>Method</th>
+            <th>Amount Paid</th>
+            <th>Timestamp</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if invoice.payments %}
+            {% for p in invoice.payments %}
+              <tr>
+                <td><code>{{ p.transaction_reference }}</code></td>
+                <td>{{ p.payment_method }}</td>
+                <td><strong style="color: #0c6943;">${{ "%.2f"|format(p.amount) }}</strong></td>
+                <td>{{ p.payment_date.strftime('%B %d, %Y - %H:%M') }}</td>
+                <td>{{ badge.render_badge(p.status) }}</td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="5" style="text-align: center; color: var(--color-text-secondary);">No payments recorded yet.</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

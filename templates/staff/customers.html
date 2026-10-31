@@ -1,0 +1,51 @@
+{% extends "staff/staff_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}Customers — MEMZO Staff{% endblock %}
+{% block page_title %}Customer Accounts{% endblock %}
+
+{% block content %}
+<div class="content-card">
+  <div class="content-card-header">
+    <h3 class="content-card-title">Customer Portfolio</h3>
+  </div>
+
+  <form method="GET" action="{{ url_for('staff.customers') }}" class="filter-search-bar">
+    <input type="text" name="q" value="{{ search }}" placeholder="Search customer name or email..." class="filter-input" style="flex-grow: 1; max-width: 320px;">
+    <button type="submit" class="btn-dark" style="padding: 9px 20px;">Search</button>
+  </form>
+
+  <div class="table-responsive-custom">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+          <th>Created</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if customers %}
+          {% for c in customers %}
+            <tr>
+              <td><strong>{{ c.name }}</strong></td>
+              <td><code>{{ c.email }}</code></td>
+              <td>{{ c.phone or '—' }}</td>
+              <td>{{ c.created_at.strftime('%b %d, %Y') }}</td>
+              <td>
+                <a href="{{ url_for('staff.customer_detail', customer_id=c.user_id) }}" class="btn-table-action">
+                  View Records &rarr;
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="5" style="text-align: center; color: var(--color-text-secondary); padding: 30px;">No customers found.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

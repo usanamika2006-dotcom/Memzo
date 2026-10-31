@@ -1,0 +1,110 @@
+{% extends "staff/staff_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}Invoice {{ invoice.invoice_number }} — MEMZO Staff{% endblock %}
+{% block page_title %}Invoice Details & Payment Recording{% endblock %}
+
+{% block content %}
+<div class="content-card">
+  <div class="content-card-header">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <h3 class="content-card-title" style="margin-bottom: 0;">{{ invoice.invoice_number }}</h3>
+      {{ badge.render_badge(invoice.status) }}
+    </div>
+    <div style="display: flex; gap: 10px;">
+      <a href="{{ url_for('staff.invoices') }}" class="btn-table-action">&larr; Back to Invoices</a>
+      <button onclick="window.print();" class="btn-table-action">Print</button>
+      {% if invoice.status == 'Draft' %}
+        <form method="POST" action="{{ url_for('staff.invoice_confirm_route', invoice_id=invoice.invoice_id) }}" style="display: inline;">
+          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+          <button type="submit" class="btn-lime" style="padding: 6px 14px; font-size: 13px;">Confirm Invoice</button>
+        </form>
+      {% endif %}
+    </div>
+  </div>
+
+  <div class="row" style="margin-top: 16px;">
+    <div class="col-md-6">
+      <div style="background: #fafbf9; border-radius: var(--radius-md); padding: 18px; border: 1px solid var(--color-border-light); font-size: 14px; display: grid; gap: 8px;">
+        <div>Customer: <strong>{{ invoice.customer.name }}</strong> ({{ invoice.customer.email }})</div>
+        <div>Date: {{ invoice.invoice_date.strftime('%B %d, %Y') }}</div>
+        <div>Due Date: <strong>{{ invoice.due_date.strftime('%B %d, %Y') }}</strong></div>
+      </div>
+    </div>
+    <div class="col-md-6">
+      <div style="background: #fafbf9; border-radius: var(--radius-md); padding: 18px; border: 1px solid var(--color-border-light); font-size: 14px; display: grid; gap: 8px;">
+        <div>Total: <strong>${{ "%.2f"|format(invoice.total_amount) }}</strong></div>
+        <div>Paid: <strong style="color: #0c6943;">${{ "%.2f"|format(invoice.amount_paid) }}</strong></div>
+        <div>Outstanding: <strong style="color: {% if invoice.outstanding_amount > 0 %}#b45309{% else %}#0c6943{% endif %};">${{ "%.2f"|format(invoice.outstanding_amount) }}</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Items Table -->
+  <div style="margin-top: 28px;">
+    <h4 style="font-size: 16px; font-weight: 800; color: var(--color-text-main); margin-bottom: 14px;">Billed Products</h4>
+    <div class="table-responsive-custom">
+      <table class="table-custom">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Total</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in invoice.items %}
+            <tr>
+              <td><strong>{{ item.product.product_name }}</strong></td>
+              <td>{{ item.quantity }}</td>
+              <td>${{ "%.2f"|format(item.unit_price) }}</td>
+              <td><strong style="color: var(--color-deep-teal);">${{ "%.2f"|format(item.total_amount) }}</strong></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Record Payment Form (if not settled) -->
+  {% if invoice.outstanding_amount > 0 %}
+    <div style="margin-top: 32px; padding: 24px; background-color: #f7faf8; border-radius: var(--radius-lg); border: 1px solid var(--color-border-light);">
+      <h4 style="font-size: 16px; font-weight: 800; color: var(--color-text-main); margin-bottom: 16px;">
+        Record Received Payment
+      </h4>
+
+      <form method="POST" action="{{ url_for('staff.record_invoice_payment', invoice_id=invoice.invoice_id) }}">
+        {{ form.hidden_tag() }}
+
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-label" for="amount">{{ form.amount.label }}</label>
+              {{ form.amount(class="form-control-custom", id="amount", max=invoice.outstanding_amount) }}
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-label" for="payment_method">{{ form.payment_method.label }}</label>
+              {{ form.payment_method(class="form-control-custom", id="payment_method") }}
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-label" for="notes">{{ form.notes.label }}</label>
+              {{ form.notes(class="form-control-custom", placeholder="Notes/Reference", id="notes") }}
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-lime" style="padding: 10px 24px; font-weight: 700;">
+          Record Settlement
+        </button>
+      </form>
+    </div>
+  {% endif %}
+</div>
+{% endblock %}
