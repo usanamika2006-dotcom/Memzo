@@ -1,0 +1,114 @@
+{% extends "admin/admin_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}Manage Software Products — Admin MEMZO{% endblock %}
+{% block page_title %}Software Product Catalogue Management{% endblock %}
+
+{% block content %}
+<div class="content-card">
+  <div class="content-card-header">
+    <div>
+      <h3 class="content-card-title">Proprietary Software Products</h3>
+      <p style="font-size: 13px; color: var(--color-text-secondary); margin-top: 4px;">
+        Manage all software items, base prices, variants, and storefront visibility.
+      </p>
+    </div>
+    <a href="{{ url_for('admin.product_add') }}" class="btn-lime">
+      + Add New Software Product
+    </a>
+  </div>
+
+  <!-- Search & Filter Controls -->
+  <form method="GET" action="{{ url_for('admin.products') }}" class="filter-search-bar">
+    <input type="text" name="q" value="{{ search }}" placeholder="Search products..." class="filter-input" style="flex-grow: 1; max-width: 320px;">
+    
+    <select name="status" class="filter-input" onchange="this.form.submit();">
+      <option value="">All Statuses</option>
+      <option value="published" {% if status_filter == 'published' %}selected{% endif %}>Published</option>
+      <option value="draft" {% if status_filter == 'draft' %}selected{% endif %}>Draft / Unpublished</option>
+      <option value="archived" {% if status_filter == 'archived' %}selected{% endif %}>Archived</option>
+    </select>
+
+    <button type="submit" class="btn-dark" style="padding: 9px 20px;">Filter</button>
+  </form>
+
+  <!-- Table -->
+  <div class="table-responsive-custom">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>Product Name</th>
+          <th>Category</th>
+          <th>Base Price</th>
+          <th>Cost</th>
+          <th>Variants</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if products %}
+          {% for p in products %}
+            <tr {% if p.is_archived %}style="opacity: 0.6;"{% endif %}>
+              <td>
+                <div style="font-weight: 800; color: var(--color-text-main);">{{ p.product_name }}</div>
+                <div style="font-size: 12px; color: var(--color-text-secondary);">ID: #{{ p.product_id }}</div>
+              </td>
+              <td>
+                <span style="background: #f0f7f3; color: var(--color-deep-teal); font-size: 11px; font-weight: 700; padding: 3px 8px; border-radius: var(--radius-full);">
+                  {{ p.product_type }}
+                </span>
+              </td>
+              <td><strong>${{ p.sales_price }}</strong></td>
+              <td>${{ p.cost_price }}</td>
+              <td>
+                <a href="{{ url_for('admin.product_variants', product_id=p.product_id) }}" class="btn-table-action" style="font-size: 11px;">
+                  {{ p.variants|length }} Variants &rarr;
+                </a>
+              </td>
+              <td>
+                {% if p.is_archived %}
+                  {{ badge.render_badge('Archived') }}
+                {% elif p.is_published %}
+                  {{ badge.render_badge('Published') }}
+                {% else %}
+                  {{ badge.render_badge('Draft') }}
+                {% endif %}
+              </td>
+              <td>
+                <div style="display: flex; gap: 6px; align-items: center;">
+                  <a href="{{ url_for('admin.product_edit', product_id=p.product_id) }}" class="btn-table-action">
+                    Edit
+                  </a>
+
+                  <!-- Toggle Publish -->
+                  <form method="POST" action="{{ url_for('admin.product_toggle_publish', product_id=p.product_id) }}" style="display: inline;">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn-table-action" title="Toggle Publish">
+                      {{ 'Unpublish' if p.is_published else 'Publish' }}
+                    </button>
+                  </form>
+
+                  <!-- Toggle Archive -->
+                  <form method="POST" action="{{ url_for('admin.product_archive', product_id=p.product_id) }}" style="display: inline;" onsubmit="return confirm('Change archive status for this product?');">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    <button type="submit" class="btn-table-action" style="color: {% if p.is_archived %}#0c6943{% else %}#b91c1c{% endif %};">
+                      {{ 'Restore' if p.is_archived else 'Archive' }}
+                    </button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="7" style="text-align: center; color: var(--color-text-secondary); padding: 40px;">
+              No products found. Click "+ Add New Software Product" to create your first item.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

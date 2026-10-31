@@ -1,0 +1,105 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Create Discount — MEMZO Admin{% endblock %}
+{% block page_title %}Create Discount Rule{% endblock %}
+
+{% block content %}
+<div class="content-card" style="max-width: 780px; margin: 0 auto;">
+  <div class="content-card-header">
+    <div>
+      <h3 class="content-card-title">New Promotional Code</h3>
+      <p style="font-size: 13px; color: var(--color-text-secondary); margin-top: 4px;">
+        Setup coupon parameters, percentage rates, or fixed reductions.
+      </p>
+    </div>
+    <a href="{{ url_for('admin.discounts') }}" class="btn-table-action">&larr; Back to Discounts</a>
+  </div>
+
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-label" for="discount_name">{{ form.discount_name.label }}</label>
+          {{ form.discount_name(class="form-control-custom", placeholder="e.g. WELCOME25", id="discount_name") }}
+          {% for error in form.discount_name.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-label" for="discount_type">{{ form.discount_type.label }}</label>
+          {{ form.discount_type(class="form-control-custom", id="discount_type") }}
+          {% for error in form.discount_type.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4">
+        <div class="form-group">
+          <label class="form-label" for="discount_value">{{ form.discount_value.label }}</label>
+          {{ form.discount_value(class="form-control-custom", placeholder="20.00", id="discount_value") }}
+          <div class="form-helper">Enter percentage or fixed dollar amount.</div>
+          {% for error in form.discount_value.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="form-group">
+          <label class="form-label" for="minimum_purchase">{{ form.minimum_purchase.label }}</label>
+          {{ form.minimum_purchase(class="form-control-custom", placeholder="0.00", id="minimum_purchase") }}
+          {% for error in form.minimum_purchase.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="form-group">
+          <label class="form-label" for="usage_limit">{{ form.usage_limit.label }}</label>
+          {{ form.usage_limit(class="form-control-custom", placeholder="e.g. 500", id="usage_limit") }}
+          {% for error in form.usage_limit.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-label" for="start_date">{{ form.start_date.label }} (Optional)</label>
+          {{ form.start_date(class="form-control-custom", id="start_date") }}
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-label" for="end_date">{{ form.end_date.label }} (Optional)</label>
+          {{ form.end_date(class="form-control-custom", id="end_date") }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+      {{ form.is_active(id="is_active", style="accent-color: #062722; width: 18px; height: 18px;") }}
+      <label for="is_active" style="font-size: 14px; font-weight: 600; cursor: pointer; user-select: none;">
+        Active Promo (Eligible for checkout application)
+      </label>
+    </div>
+
+    <div style="margin-top: 32px; display: flex; gap: 12px;">
+      {{ form.submit(class="btn-lime", style="padding: 12px 28px;") }}
+      <a href="{{ url_for('admin.discounts') }}" class="btn-dark" style="background-color: #64748b;">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

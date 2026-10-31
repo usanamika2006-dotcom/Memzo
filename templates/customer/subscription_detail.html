@@ -1,0 +1,141 @@
+{% extends "customer/customer_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}Subscription {{ subscription.subscription_number }} — MEMZO Customer Portal{% endblock %}
+{% block page_title %}Subscription Overview{% endblock %}
+
+{% block content %}
+<div class="content-card">
+  <div class="content-card-header">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <h3 class="content-card-title" style="margin-bottom: 0;">{{ subscription.subscription_number }}</h3>
+      {{ badge.render_badge(subscription.status) }}
+    </div>
+    <a href="{{ url_for('customer.subscriptions') }}" class="btn-table-action">&larr; Back to My Subscriptions</a>
+  </div>
+
+  <div class="row" style="margin-top: 16px;">
+    <div class="col-md-6">
+      <div style="background: #fafbf9; border-radius: var(--radius-md); border: 1px solid var(--color-border-light); padding: 22px; font-size: 14px; display: grid; gap: 10px;">
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--color-text-secondary);">Software Product:</span>
+          <strong>{{ subscription.plan.product.product_name }}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--color-text-secondary);">Plan Tier:</span>
+          <strong>{{ subscription.plan.plan_name }}</strong>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--color-text-secondary);">Billing Frequency:</span>
+          <span>{{ subscription.plan.billing_cycle }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--color-text-secondary);">Start Date:</span>
+          <span>{{ subscription.start_date.strftime('%B %d, %Y') }}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between;">
+          <span style="color: var(--color-text-secondary);">Current Expiry Date:</span>
+          <strong {% if subscription.is_expired and subscription.status == 'Active' %}style="color: #ef4444;"{% endif %}>
+            {{ subscription.expiry_date.strftime('%B %d, %Y') }}
+          </strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions Box -->
+    <div class="col-md-6">
+      <div style="background: #fafbf9; border-radius: var(--radius-md); border: 1px solid var(--color-border-light); padding: 22px;">
+        <h4 style="font-size: 15px; font-weight: 800; color: var(--color-text-main); margin-bottom: 14px;">Subscription Actions</h4>
+
+        {% if subscription.status == 'Active' %}
+          {% if subscription.plan.allow_renew %}
+            <form method="POST" action="{{ url_for('customer.subscription_renew', subscription_id=subscription.subscription_id) }}" style="margin-bottom: 14px;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn-lime" style="width: 100%; padding: 12px; font-weight: 700;">
+                🔄 Renew Subscription (Extend +1 {{ subscription.plan.billing_cycle }})
+              </button>
+            </form>
+          {% endif %}
+
+          {% if subscription.plan.allow_early_close %}
+            <form method="POST" action="{{ url_for('customer.subscription_close', subscription_id=subscription.subscription_id) }}" onsubmit="return confirm('Are you sure you want to cancel this subscription?');">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+              <button type="submit" class="btn-dark" style="width: 100%; padding: 10px; background-color: #fee2e2; color: #b91c1c; border: 1px solid #fca5a5;">
+                Cancel Subscription
+              </button>
+            </form>
+          {% endif %}
+        {% else %}
+          <div style="font-size: 13px; color: var(--color-text-secondary);">
+            This subscription is currently marked as <strong>{{ subscription.status }}</strong>. Contact support or browse our catalogue for a new plan.
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Subscription Items -->
+  <div style="margin-top: 28px;">
+    <h4 style="font-size: 16px; font-weight: 800; color: var(--color-text-main); margin-bottom: 14px;">License & Seat Breakdown</h4>
+    <div class="table-responsive-custom">
+      <table class="table-custom">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Edition / Variant</th>
+            <th>Quantity / Seats</th>
+            <th>Cycle Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in subscription.items %}
+            <tr>
+              <td><strong>{{ item.product.product_name }}</strong></td>
+              <td>{{ item.variant.variant_name if item.variant else 'Standard Edition' }}</td>
+              <td>{{ item.quantity }} seat(s)</td>
+              <td><strong style="color: var(--color-deep-teal);">${{ "%.2f"|format(item.total_amount) }}</strong></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Associated Invoices -->
+  <div style="margin-top: 28px;">
+    <h4 style="font-size: 16px; font-weight: 800; color: var(--color-text-main); margin-bottom: 14px;">Associated Invoices</h4>
+    <div class="table-responsive-custom">
+      <table class="table-custom">
+        <thead>
+          <tr>
+            <th>Invoice #</th>
+            <th>Invoice Date</th>
+            <th>Total</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if subscription.invoices %}
+            {% for inv in subscription.invoices %}
+              <tr>
+                <td><code>{{ inv.invoice_number }}</code></td>
+                <td>{{ inv.invoice_date.strftime('%b %d, %Y') }}</td>
+                <td><strong>${{ "%.2f"|format(inv.total_amount) }}</strong></td>
+                <td>{{ badge.render_badge(inv.status) }}</td>
+                <td>
+                  <a href="{{ url_for('customer.invoice_detail', invoice_id=inv.invoice_id) }}" class="btn-table-action">
+                    View & Pay &rarr;
+                  </a>
+                </td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="5" style="text-align: center; color: var(--color-text-secondary);">No invoices linked.</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

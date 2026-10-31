@@ -1,0 +1,153 @@
+/* ==========================================================================
+   MEMZO AUTHENTICATION STYLES (auth.css)
+   ========================================================================== */
+
+.auth-page {
+  min-height: 90vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 16px;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 520px;
+  background-color: var(--color-white);
+  border-radius: var(--radius-xl);
+  overflow: hidden;
+  box-shadow: 0 20px 50px rgba(6, 39, 34, 0.1);
+  border: 1px solid var(--color-border-light);
+}
+
+.auth-header {
+  background-color: var(--color-deep-teal);
+  padding: 36px 36px 32px;
+  text-align: center;
+  position: relative;
+}
+
+.auth-header .auth-logo {
+  height: 38px;
+  margin-bottom: 18px;
+}
+
+.auth-header h1 {
+  color: var(--color-mint-green);
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+}
+
+.auth-header p {
+  color: #8daea0;
+  font-size: 14px;
+}
+
+.auth-body {
+  padding: 36px;
+}
+
+.form-group {
+  margin-bottom: 22px;
+}
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--color-text-main);
+  margin-bottom: 8px;
+}
+
+.form-control-custom {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 14px;
+  font-family: inherit;
+  color: var(--color-text-main);
+  background-color: #fafbfc;
+  border: 1.5px solid var(--color-border-light);
+  border-radius: var(--radius-md);
+  outline: none;
+  transition: all 0.2s ease;
+}
+
+.form-control-custom:focus {
+  background-color: var(--color-white);
+  border-color: var(--color-deep-teal);
+  box-shadow: 0 0 0 3px rgba(145, 232, 193, 0.3);
+}
+
+.form-error {
+  color: var(--color-danger);
+  font-size: 12px;
+  margin-top: 6px;
+  display: block;
+  font-weight: 500;
+}
+
+.form-helper {
+  color: var(--color-text-secondary);
+  font-size: 12px;
+  margin-top: 6px;
+}
+
+.password-rules {
+  background-color: #f7faf8;
+  border: 1px solid #e1ebe5;
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+  margin-top: 10px;
+  font-size: 12px;
+  color: var(--color-text-secondary);
+}
+
+.password-rules ul {
+  padding-left: 18px;
+  margin-top: 6px;
+}
+
+.password-rules li {
+  margin-bottom: 3px;
+}
+
+.auth-btn-submit {
+  width: 100%;
+  padding: 13px;
+  font-size: 15px;
+  margin-top: 8px;
+}
+
+.auth-footer {
+  text-align: center;
+  padding: 20px 36px 30px;
+  border-top: 1px solid var(--color-border-light);
+  font-size: 14px;
+  color: var(--color-text-secondary);
+}
+
+.auth-footer a {
+  color: var(--color-deep-teal);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.auth-footer a:hover {
+  text-decoration: underline;
+}
+
+.demo-credentials-box {
+  background-color: #f0f7f4;
+  border: 1px solid #c8e3d5;
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  margin-top: 24px;
+  font-size: 12px;
+  color: #17382e;
+}
+
+.demo-credentials-box strong {
+  color: var(--color-deep-teal);
+}

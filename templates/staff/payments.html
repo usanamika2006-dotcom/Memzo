@@ -1,0 +1,50 @@
+{% extends "staff/staff_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}Payments — MEMZO Staff{% endblock %}
+{% block page_title %}Recorded Settlements{% endblock %}
+
+{% block content %}
+<div class="content-card">
+  <div class="content-card-header">
+    <h3 class="content-card-title">Payments Log</h3>
+  </div>
+
+  <div class="table-responsive-custom">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <th>Customer</th>
+          <th>Invoice #</th>
+          <th>Method</th>
+          <th>Amount</th>
+          <th>Timestamp</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if payments %}
+          {% for p in payments %}
+            <tr>
+              <td><code>{{ p.transaction_reference }}</code></td>
+              <td><strong>{{ p.customer.name }}</strong></td>
+              <td>
+                <a href="{{ url_for('staff.invoice_detail', invoice_id=p.invoice_id) }}" style="color: var(--color-deep-teal); font-weight: 700; text-decoration: none;">
+                  {{ p.invoice.invoice_number }}
+                </a>
+              </td>
+              <td>{{ p.payment_method }}</td>
+              <td><strong style="color: #0c6943;">${{ "%.2f"|format(p.amount) }}</strong></td>
+              <td>{{ p.payment_date.strftime('%b %d, %Y - %H:%M') }}</td>
+              <td>{{ badge.render_badge(p.status) }}</td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="7" style="text-align: center; color: var(--color-text-secondary); padding: 30px;">No payments recorded.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

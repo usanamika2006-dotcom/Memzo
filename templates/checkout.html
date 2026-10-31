@@ -1,0 +1,118 @@
+{% extends "base.html" %}
+
+{% block title %}Checkout & Activation — MEMZO{% endblock %}
+
+{% block content %}
+<div style="background-color: var(--color-deep-teal); padding: 40px 32px; text-align: center;">
+  <h1 style="color: var(--color-mint-green); font-size: 32px; font-weight: 800; letter-spacing: -0.02em; margin-bottom: 8px;">
+    Complete Your Subscription
+  </h1>
+  <p style="color: #8daea0; font-size: 15px;">
+    Review license seats, apply discounts, and activate your software access.
+  </p>
+</div>
+
+<div style="padding: 60px 32px; background-color: #f7faf8;">
+  <div style="max-width: 1000px; margin: 0 auto;">
+    
+    <div style="display: grid; grid-template-columns: 1fr; gap: 32px;" class="checkout-grid">
+      <div style="display: grid; grid-template-columns: 1fr; gap: 32px; @media (min-width: 992px) { grid-template-columns: 1.2fr 0.8fr; }">
+        
+        <!-- Left: Configuration Form -->
+        <div style="background: white; border-radius: var(--radius-xl); border: 1px solid var(--color-border-light); padding: 36px; box-shadow: var(--shadow-sm);">
+          <h2 style="font-size: 20px; font-weight: 800; color: var(--color-text-main); margin-bottom: 24px;">
+            Subscription Configuration
+          </h2>
+
+          <form method="POST" action="{{ url_for('public.checkout', plan_id=plan.plan_id) }}" id="checkout-form">
+            {{ form.hidden_tag() }}
+
+            <div class="form-group">
+              <label class="form-label" for="plan_id">Selected Plan</label>
+              {{ form.plan_id(class="form-control-custom", id="plan_id", readonly=true) }}
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="variant_id">Product Edition / Tier</label>
+              {{ form.variant_id(class="form-control-custom", id="variant_id", onchange="document.getElementById('checkout-form').submit();") }}
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="quantity">Number of User Seats / Licenses</label>
+              {{ form.quantity(class="form-control-custom", id="quantity", min=plan.minimum_quantity, onchange="document.getElementById('checkout-form').submit();") }}
+              <div class="form-helper">Minimum required for this plan: {{ plan.minimum_quantity }} seat(s).</div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="discount_code">Promotional Code</label>
+              <div style="display: flex; gap: 10px;">
+                {{ form.discount_code(class="form-control-custom", placeholder="e.g. WELCOME20", id="discount_code") }}
+                <button type="submit" class="btn-dark" style="padding: 0 20px; font-size: 13px; white-space: nowrap;">Apply</button>
+              </div>
+              {% if discount_msg %}
+                <span style="font-size: 13px; margin-top: 6px; display: block; font-weight: 600; color: {% if discount_valid %}#0c6943{% else %}#ef4444{% endif %};">
+                  {{ discount_msg }}
+                </span>
+              {% endif %}
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="payment_method">Payment Processing Method</label>
+              {{ form.payment_method(class="form-control-custom", id="payment_method") }}
+              <div class="form-helper">
+                Simulated Gateway: No real credit card or bank funds will be charged.
+              </div>
+            </div>
+
+            <div style="margin-top: 32px;">
+              {{ form.submit(class="btn-lime", style="width: 100%; padding: 14px; font-size: 16px; font-weight: 800;", id="complete-checkout-btn") }}
+            </div>
+          </form>
+        </div>
+
+        <!-- Right: Order Summary Panel -->
+        <div style="background: white; border-radius: var(--radius-xl); border: 1px solid var(--color-border-light); padding: 36px; box-shadow: var(--shadow-sm); height: fit-content;">
+          <h2 style="font-size: 20px; font-weight: 800; color: var(--color-text-main); margin-bottom: 20px;">
+            Order Summary
+          </h2>
+
+          <div style="padding-bottom: 18px; border-bottom: 1px solid var(--color-border-light); margin-bottom: 18px;">
+            <div style="font-size: 16px; font-weight: 800; color: var(--color-deep-teal);">{{ product.product_name }}</div>
+            <div style="font-size: 13px; color: var(--color-text-secondary); margin-top: 4px;">{{ plan.plan_name }} ({{ plan.billing_cycle }})</div>
+          </div>
+
+          <div style="display: flex; flex-direction: column; gap: 12px; font-size: 14px;">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--color-text-secondary);">Subtotal (Seats & Edition):</span>
+              <span style="font-weight: 700; color: var(--color-text-main);">${{ "%.2f"|format(subtotal) }}</span>
+            </div>
+
+            {% if discount_amount > 0 %}
+              <div style="display: flex; justify-content: space-between; color: #0c6943;">
+                <span>Discount Applied:</span>
+                <span style="font-weight: 700;">-${{ "%.2f"|format(discount_amount) }}</span>
+              </div>
+            {% endif %}
+
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--color-text-secondary);">Tax & VAT ({{ tax_rate }}%):</span>
+              <span style="font-weight: 700; color: var(--color-text-main);">${{ "%.2f"|format(tax_amount) }}</span>
+            </div>
+
+            <div style="display: flex; justify-content: space-between; padding-top: 16px; border-top: 2px solid var(--color-deep-teal); font-size: 20px; font-weight: 800; color: var(--color-deep-teal); margin-top: 8px;">
+              <span>Total Due:</span>
+              <span>${{ "%.2f"|format(final_total) }}</span>
+            </div>
+          </div>
+
+          <div style="background-color: #fafbf9; border-radius: var(--radius-md); padding: 14px; margin-top: 24px; font-size: 12px; color: var(--color-text-secondary); line-height: 1.5;">
+            🔒 <strong>Instant Automated Activation:</strong> Upon completion, your invoice will be generated and subscription status set to <strong>Active</strong>.
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

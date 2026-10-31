@@ -1,0 +1,71 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}System Settings — MEMZO Admin{% endblock %}
+{% block page_title %}System & Company Configuration{% endblock %}
+
+{% block content %}
+<div class="content-card" style="max-width: 800px; margin: 0 auto;">
+  <div class="content-card-header">
+    <div>
+      <h3 class="content-card-title">MEMZO Platform Settings</h3>
+      <p style="font-size: 13px; color: var(--color-text-secondary); margin-top: 4px;">
+        Global configuration for billing details, invoice branding, and default parameters.
+      </p>
+    </div>
+  </div>
+
+  <form method="POST">
+    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+    <div class="form-group">
+      <label class="form-label" for="company_name">Company Legal Name</label>
+      <input type="text" name="company_name" id="company_name" value="{{ settings.get('company_name', 'MEMZO Technologies Inc.') }}" class="form-control-custom">
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-label" for="company_email">Billing / Financial Email</label>
+          <input type="email" name="company_email" id="company_email" value="{{ settings.get('company_email', 'billing@memzo.com') }}" class="form-control-custom">
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-label" for="support_email">Customer Support Email</label>
+          <input type="email" name="support_email" id="support_email" value="{{ settings.get('support_email', 'support@memzo.com') }}" class="form-control-custom">
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4">
+        <div class="form-group">
+          <label class="form-label" for="default_currency">Default Currency</label>
+          <input type="text" name="default_currency" id="default_currency" value="{{ settings.get('default_currency', 'USD ($)') }}" class="form-control-custom">
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="form-group">
+          <label class="form-label" for="invoice_prefix">Invoice Number Prefix</label>
+          <input type="text" name="invoice_prefix" id="invoice_prefix" value="{{ settings.get('invoice_prefix', 'INV') }}" class="form-control-custom">
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="form-group">
+          <label class="form-label" for="trial_period_days">Free Trial Days</label>
+          <input type="number" name="trial_period_days" id="trial_period_days" value="{{ settings.get('trial_period_days', '14') }}" class="form-control-custom">
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 32px;">
+      <button type="submit" class="btn-lime" style="padding: 12px 28px; font-weight: 700;">
+        Save System Settings
+      </button>
+    </div>
+  </form>
+</div>
+{% endblock %}

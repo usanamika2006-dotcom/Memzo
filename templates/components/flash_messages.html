@@ -1,0 +1,12 @@
+{% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="flash-messages-container" style="position: fixed; top: 24px; right: 24px; z-index: 9999; max-width: 420px; display: flex; flex-direction: column; gap: 10px;">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category if category != 'error' else 'danger' }} alert-dismissible fade show" role="alert" style="box-shadow: 0 10px 25px rgba(0,0,0,0.15); border-radius: 12px; font-weight: 500; font-size: 14px; padding: 14px 18px; border: none; display: flex; align-items: center; justify-content: space-between; {% if category == 'success' %}background-color: #062722; color: #91E8C1;{% elif category == 'danger' %}background-color: #ef4444; color: #ffffff;{% elif category == 'warning' %}background-color: #f59e0b; color: #ffffff;{% else %}background-color: #0b3831; color: #ffffff;{% endif %}">
+          <span>{{ message }}</span>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="alert" aria-label="Close" style="font-size: 10px; margin-left: 12px;"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}

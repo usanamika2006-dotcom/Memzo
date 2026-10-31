@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}404 Not Found — MEMZO{% endblock %}
+
+{% block content %}
+<div style="padding: 100px 24px; text-align: center; background: white;">
+  <div style="font-size: 64px; font-weight: 800; color: var(--color-deep-teal); margin-bottom: 8px;">404</div>
+  <h1 style="font-size: 28px; font-weight: 800; color: var(--color-text-main); margin-bottom: 16px;">Page Not Found</h1>
+  <p style="color: var(--color-text-secondary); max-width: 500px; margin: 0 auto 32px; line-height: 1.6;">
+    The requested page or subscription resource could not be found or has been moved.
+  </p>
+  <a href="{{ url_for('public.index') }}" class="btn-lime">Return to Homepage</a>
+</div>
+{% endblock %}

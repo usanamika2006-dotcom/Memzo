@@ -1,0 +1,94 @@
+{% extends "admin/admin_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}Tax Rules — MEMZO Admin{% endblock %}
+{% block page_title %}Tax Rules & Compliance{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-5">
+    <div class="content-card">
+      <h3 class="content-card-title" style="margin-bottom: 8px;">Add New Tax Rule</h3>
+      <p style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: 20px;">
+        Applicable taxes are automatically applied during checkout and invoice generation.
+      </p>
+
+      <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="form-group">
+          <label class="form-label" for="tax_name">{{ form.tax_name.label }}</label>
+          {{ form.tax_name(class="form-control-custom", placeholder="e.g. Standard Software VAT", id="tax_name") }}
+          {% for error in form.tax_name.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="tax_percentage">{{ form.tax_percentage.label }}</label>
+          {{ form.tax_percentage(class="form-control-custom", placeholder="10.00", id="tax_percentage") }}
+          <div class="form-helper">Enter percentage rate (e.g. 10.00 for 10%).</div>
+          {% for error in form.tax_percentage.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+          {{ form.is_active(id="is_active", style="accent-color: #062722; width: 16px; height: 16px;") }}
+          <label for="is_active" style="font-size: 13px; font-weight: 600; cursor: pointer; user-select: none;">
+            Active Tax Rule
+          </label>
+        </div>
+
+        {{ form.submit(class="btn-lime", style="width: 100%;") }}
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="content-card">
+      <div class="content-card-header">
+        <h3 class="content-card-title">Configured Tax Rules</h3>
+      </div>
+
+      <div class="table-responsive-custom">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th>Rule Name</th>
+              <th>Percentage</th>
+              <th>Status</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if taxes %}
+              {% for t in taxes %}
+                <tr>
+                  <td><strong>{{ t.tax_name }}</strong></td>
+                  <td><strong style="color: var(--color-deep-teal); font-size: 15px;">{{ t.tax_percentage }}%</strong></td>
+                  <td>{{ badge.render_badge('Active' if t.is_active else 'Closed') }}</td>
+                  <td>
+                    <form method="POST" action="{{ url_for('admin.tax_toggle', tax_id=t.tax_id) }}" style="display: inline;">
+                      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                      <button type="submit" class="btn-table-action" style="color: {% if t.is_active %}#b91c1c{% else %}#0c6943{% endif %};">
+                        {{ 'Disable' if t.is_active else 'Enable' }}
+                      </button>
+                    </form>
+                  </td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="4" style="text-align: center; color: var(--color-text-secondary); padding: 30px;">
+                  No tax rules added.
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

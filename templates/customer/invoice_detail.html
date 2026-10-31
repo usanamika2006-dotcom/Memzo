@@ -1,0 +1,200 @@
+{% extends "customer/customer_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}Invoice {{ invoice.invoice_number }} — MEMZO Customer Portal{% endblock %}
+{% block page_title %}Invoice Details & Payment{% endblock %}
+
+{% block content %}
+<div class="content-card">
+  <div class="content-card-header">
+    <div style="display: flex; align-items: center; gap: 14px;">
+      <h3 class="content-card-title" style="margin-bottom: 0;">{{ invoice.invoice_number }}</h3>
+      {{ badge.render_badge(invoice.status) }}
+      {% if invoice.is_overdue %}
+        <span class="status-pill status-closed">Overdue</span>
+      {% endif %}
+    </div>
+
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <a href="{{ url_for('customer.invoices') }}" class="btn-table-action">&larr; Back to Invoices</a>
+      <button onclick="window.print();" class="btn-table-action">
+        Print Invoice
+      </button>
+    </div>
+  </div>
+
+  <!-- Printable Invoice Section -->
+  <div class="invoice-print-view" style="margin-top: 24px;">
+    <div class="invoice-brand-header">
+      <div>
+        <img src="{{ url_for('static', filename='images/logo.svg') }}" alt="MEMZO" height="36" onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/logo.png') }}';">
+        <div style="font-size: 13px; color: var(--color-text-secondary); margin-top: 8px;">
+          MEMZO Software Technologies Inc.<br>
+          support@memzo.com
+        </div>
+      </div>
+
+      <div style="text-align: right;">
+        <div style="font-size: 24px; font-weight: 800; color: var(--color-deep-teal);">INVOICE</div>
+        <div style="font-size: 14px; font-weight: 700; color: var(--color-text-main); margin-top: 4px;">{{ invoice.invoice_number }}</div>
+        <div style="font-size: 13px; color: var(--color-text-secondary); margin-top: 4px;">
+          Date: {{ invoice.invoice_date.strftime('%B %d, %Y') }}<br>
+          Due Date: {{ invoice.due_date.strftime('%B %d, %Y') }}
+        </div>
+      </div>
+    </div>
+
+    <!-- Billed Customer -->
+    <div style="margin-bottom: 24px; padding-bottom: 18px; border-bottom: 1px solid var(--color-border-light);">
+      <div style="font-size: 12px; font-weight: 700; color: var(--color-text-secondary); text-transform: uppercase;">Customer:</div>
+      <div style="font-size: 16px; font-weight: 800; color: var(--color-text-main); margin-top: 4px;">{{ invoice.customer.name }}</div>
+      <div style="font-size: 14px; color: var(--color-text-secondary);">
+        {{ invoice.customer.email }}
+      </div>
+    </div>
+
+    <!-- Line items -->
+    <div class="table-responsive-custom">
+      <table class="table-custom">
+        <thead>
+          <tr>
+            <th>Product / Service</th>
+            <th>Quantity</th>
+            <th>Unit Price</th>
+            <th>Total Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in invoice.items %}
+            <tr>
+              <td><strong>{{ item.product.product_name }}</strong></td>
+              <td>{{ item.quantity }}</td>
+              <td>${{ "%.2f"|format(item.unit_price) }}</td>
+              <td><strong style="color: var(--color-deep-teal);">${{ "%.2f"|format(item.total_amount) }}</strong></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Financial Summary Box -->
+    <div class="invoice-summary-box" style="max-width: 360px; margin-left: auto;">
+      <div class="summary-row">
+        <span style="color: var(--color-text-secondary);">Subtotal:</span>
+        <span>${{ "%.2f"|format(invoice.subtotal) }}</span>
+      </div>
+
+      {% if invoice.discount_amount > 0 %}
+        <div class="summary-row" style="color: #0c6943;">
+          <span>Discount Applied:</span>
+          <span>-${{ "%.2f"|format(invoice.discount_amount) }}</span>
+        </div>
+      {% endif %}
+
+      <div class="summary-row">
+        <span style="color: var(--color-text-secondary);">Taxes:</span>
+        <span>${{ "%.2f"|format(invoice.tax_amount) }}</span>
+      </div>
+
+      <div class="summary-row total">
+        <span>Total:</span>
+        <span>${{ "%.2f"|format(invoice.total_amount) }}</span>
+      </div>
+
+      <div class="summary-row" style="color: #0c6943; font-weight: 700;">
+        <span>Amount Settled:</span>
+        <span>${{ "%.2f"|format(invoice.amount_paid) }}</span>
+      </div>
+
+      <div class="summary-row" style="font-size: 16px; font-weight: 800; color: {% if invoice.outstanding_amount > 0 %}#b45309{% else %}#0c6943{% endif %}; border-top: 1px solid var(--color-border-light); padding-top: 8px;">
+        <span>Outstanding Due:</span>
+        <span>${{ "%.2f"|format(invoice.outstanding_amount) }}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Simulated Payment Action (if balance remaining) -->
+  {% if invoice.outstanding_amount > 0 %}
+    <div style="margin-top: 36px; padding: 28px; background-color: #f7faf8; border-radius: var(--radius-lg); border: 1.5px solid var(--color-border-light);">
+      <h4 style="font-size: 18px; font-weight: 800; color: var(--color-text-main); margin-bottom: 12px;">
+        Settle Outstanding Balance
+      </h4>
+      <p style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: 20px;">
+        Execute simulated card payment or wire settlement to clear this invoice balance.
+      </p>
+
+      <form method="POST" action="{{ url_for('customer.invoice_pay', invoice_id=invoice.invoice_id) }}">
+        {{ form.hidden_tag() }}
+
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-label" for="amount">Payment Amount ($)</label>
+              {{ form.amount(class="form-control-custom", id="amount", max=invoice.outstanding_amount) }}
+              <div class="form-helper">Outstanding: ${{ "%.2f"|format(invoice.outstanding_amount) }}</div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-label" for="payment_method">Payment Method</label>
+              {{ form.payment_method(class="form-control-custom", id="payment_method") }}
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="form-group">
+              <label class="form-label" for="notes">Notes / Reference (Optional)</label>
+              {{ form.notes(class="form-control-custom", placeholder="e.g. Card ending 4242", id="notes") }}
+            </div>
+          </div>
+        </div>
+
+        <button type="submit" class="btn-lime" style="padding: 12px 28px; font-weight: 700; font-size: 15px;">
+          Pay ${{ "%.2f"|format(invoice.outstanding_amount) }} Now
+        </button>
+      </form>
+    </div>
+  {% else %}
+    <div style="margin-top: 28px; padding: 18px 24px; background-color: #e5fbf0; border-radius: var(--radius-md); border: 1px solid #a7f3d0; display: flex; align-items: center; gap: 12px; color: #0c6943;">
+      <span style="font-size: 20px;">✓</span>
+      <div>
+        <strong>Invoice Fully Paid:</strong> All charges on this invoice have been settled successfully. Thank you for your business.
+      </div>
+    </div>
+  {% endif %}
+
+  <!-- Payments on this Invoice -->
+  <div style="margin-top: 36px;">
+    <h4 style="font-size: 16px; font-weight: 800; color: var(--color-text-main); margin-bottom: 14px;">Payments on this Statement</h4>
+    <div class="table-responsive-custom">
+      <table class="table-custom">
+        <thead>
+          <tr>
+            <th>Transaction Ref</th>
+            <th>Method</th>
+            <th>Amount Paid</th>
+            <th>Timestamp</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if invoice.payments %}
+            {% for p in invoice.payments %}
+              <tr>
+                <td><code>{{ p.transaction_reference }}</code></td>
+                <td>{{ p.payment_method }}</td>
+                <td><strong style="color: #0c6943;">${{ "%.2f"|format(p.amount) }}</strong></td>
+                <td>{{ p.payment_date.strftime('%B %d, %Y - %H:%M') }}</td>
+                <td>{{ badge.render_badge(p.status) }}</td>
+              </tr>
+            {% endfor %}
+          {% else %}
+            <tr><td colspan="5" style="text-align: center; color: var(--color-text-secondary);">No payments yet recorded on this invoice.</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

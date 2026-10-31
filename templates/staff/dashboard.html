@@ -1,0 +1,124 @@
+{% extends "staff/staff_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}Staff Workspace — MEMZO{% endblock %}
+{% block page_title %}Daily Operational Dashboard{% endblock %}
+
+{% block content %}
+<!-- Quick Stat Metrics -->
+<div class="metrics-grid">
+  <div class="metric-card">
+    <div class="metric-card-title">Managed Customers</div>
+    <div class="metric-card-val">{{ metrics.total_customers }}</div>
+    <div class="metric-card-meta">Active accounts</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-card-title">Active Subscriptions</div>
+    <div class="metric-card-val" style="color: #0c6943;">{{ metrics.active_subscriptions }}</div>
+    <div class="metric-card-meta">Live services running</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-card-title">Pending Invoices</div>
+    <div class="metric-card-val" style="color: #b45309;">{{ metrics.pending_invoices_count }}</div>
+    <div class="metric-card-meta">Invoices needing settlement</div>
+  </div>
+
+  <div class="metric-card">
+    <div class="metric-card-title">Overdue Invoices</div>
+    <div class="metric-card-val" style="color: #b91c1c;">{{ metrics.overdue_invoices_count }}</div>
+    <div class="metric-card-meta">Follow-up required</div>
+  </div>
+</div>
+
+<!-- Operational Actions Bar -->
+<div style="display: flex; gap: 14px; flex-wrap: wrap; margin-bottom: 28px;">
+  <a href="{{ url_for('staff.quotation_add') }}" class="btn-lime">
+    + Draft New Commercial Quote
+  </a>
+  <a href="{{ url_for('staff.invoices', status='Confirmed') }}" class="btn-dark">
+    View Pending Invoices
+  </a>
+  <a href="{{ url_for('staff.subscriptions') }}" class="btn-sign-in" style="color: var(--color-deep-teal); border-color: var(--color-deep-teal);">
+    Check Subscriptions
+  </a>
+</div>
+
+<!-- Recent Operational Records -->
+<div class="row">
+  <div class="col-lg-6">
+    <div class="content-card">
+      <div class="content-card-header">
+        <h3 class="content-card-title">Recent Subscriptions</h3>
+        <a href="{{ url_for('staff.subscriptions') }}" class="btn-table-action">All &rarr;</a>
+      </div>
+      <div class="table-responsive-custom">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th>Number</th>
+              <th>Customer</th>
+              <th>Product</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if metrics.recent_subscriptions %}
+              {% for s in metrics.recent_subscriptions %}
+                <tr>
+                  <td>
+                    <a href="{{ url_for('staff.subscription_detail', subscription_id=s.subscription_id) }}" style="color: var(--color-deep-teal); font-weight: 700; text-decoration: none;">
+                      {{ s.subscription_number }}
+                    </a>
+                  </td>
+                  <td>{{ s.customer.name }}</td>
+                  <td>{{ s.plan.product.product_name }}</td>
+                  <td>{{ badge.render_badge(s.status) }}</td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr><td colspan="4" style="text-align: center; color: var(--color-text-secondary);">No subscriptions.</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="content-card">
+      <div class="content-card-header">
+        <h3 class="content-card-title">Recent Settlements</h3>
+        <a href="{{ url_for('staff.payments') }}" class="btn-table-action">All &rarr;</a>
+      </div>
+      <div class="table-responsive-custom">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th>Reference</th>
+              <th>Customer</th>
+              <th>Amount</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if metrics.recent_payments %}
+              {% for p in metrics.recent_payments %}
+                <tr>
+                  <td><code>{{ p.transaction_reference }}</code></td>
+                  <td>{{ p.customer.name }}</td>
+                  <td><strong style="color: #0c6943;">${{ "%.2f"|format(p.amount) }}</strong></td>
+                  <td>{{ badge.render_badge(p.status) }}</td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr><td colspan="4" style="text-align: center; color: var(--color-text-secondary);">No recorded payments.</td></tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

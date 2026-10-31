@@ -1,0 +1,62 @@
+{% extends "admin/admin_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}Payments & Settlements — MEMZO Admin{% endblock %}
+{% block page_title %}Payments & Transaction History{% endblock %}
+
+{% block content %}
+<div class="content-card">
+  <div class="content-card-header">
+    <div>
+      <h3 class="content-card-title">All Payment Settlements</h3>
+      <p style="font-size: 13px; color: var(--color-text-secondary); margin-top: 4px;">
+        Complete transaction log with gateway simulation references and customer reconciliation.
+      </p>
+    </div>
+  </div>
+
+  <div class="table-responsive-custom">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>Reference</th>
+          <th>Customer</th>
+          <th>Invoice #</th>
+          <th>Payment Method</th>
+          <th>Amount Settled</th>
+          <th>Timestamp</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if payments %}
+          {% for p in payments %}
+            <tr>
+              <td><code>{{ p.transaction_reference }}</code></td>
+              <td>
+                <strong>{{ p.customer.name }}</strong>
+                <div style="font-size: 11px; color: var(--color-text-secondary);">{{ p.customer.email }}</div>
+              </td>
+              <td>
+                <a href="{{ url_for('admin.invoice_detail', invoice_id=p.invoice_id) }}" style="color: var(--color-deep-teal); font-weight: 700; text-decoration: none;">
+                  {{ p.invoice.invoice_number }}
+                </a>
+              </td>
+              <td>{{ p.payment_method }}</td>
+              <td><strong style="color: #0c6943; font-size: 15px;">${{ "%.2f"|format(p.amount) }}</strong></td>
+              <td>{{ p.payment_date.strftime('%b %d, %Y - %H:%M') }}</td>
+              <td>{{ badge.render_badge(p.status) }}</td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="7" style="text-align: center; color: var(--color-text-secondary); padding: 40px;">
+              No payment transactions recorded yet.
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

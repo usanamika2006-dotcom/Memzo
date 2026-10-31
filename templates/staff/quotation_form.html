@@ -1,0 +1,64 @@
+{% extends "staff/staff_base.html" %}
+
+{% block title %}Draft Quotation — MEMZO Staff{% endblock %}
+{% block page_title %}Draft Commercial Quotation{% endblock %}
+
+{% block content %}
+<div class="content-card" style="max-width: 800px; margin: 0 auto;">
+  <div class="content-card-header">
+    <h3 class="content-card-title">Commercial Proposal</h3>
+    <a href="{{ url_for('staff.quotations') }}" class="btn-table-action">&larr; Back to Quotations</a>
+  </div>
+
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="form-group">
+      <label class="form-label" for="customer_id">{{ form.customer_id.label }}</label>
+      {{ form.customer_id(class="form-control-custom", id="customer_id") }}
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-label" for="product_id">{{ form.product_id.label }}</label>
+          {{ form.product_id(class="form-control-custom", id="product_id") }}
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-label" for="quantity">{{ form.quantity.label }}</label>
+          {{ form.quantity(class="form-control-custom", id="quantity") }}
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-label" for="unit_price">{{ form.unit_price.label }}</label>
+          {{ form.unit_price(class="form-control-custom", id="unit_price") }}
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-label" for="valid_until">{{ form.valid_until.label }}</label>
+          {{ form.valid_until(class="form-control-custom", id="valid_until") }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="notes">{{ form.notes.label }}</label>
+      {{ form.notes(class="form-control-custom", rows="3", id="notes") }}
+    </div>
+
+    <div style="margin-top: 32px; display: flex; gap: 12px;">
+      {{ form.submit(class="btn-lime", style="padding: 12px 28px;") }}
+      <a href="{{ url_for('staff.quotations') }}" class="btn-dark" style="background-color: #64748b;">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

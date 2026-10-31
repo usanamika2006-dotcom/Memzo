@@ -1,0 +1,95 @@
+{% extends "staff/staff_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}Customer: {{ customer.name }} — MEMZO Staff{% endblock %}
+{% block page_title %}Customer Operational Records{% endblock %}
+
+{% block content %}
+<div class="content-card">
+  <div class="content-card-header">
+    <div>
+      <h3 class="content-card-title">{{ customer.name }}</h3>
+      <div style="font-size: 13px; color: var(--color-text-secondary); margin-top: 2px;">
+        <code>{{ customer.email }}</code> • Phone: {{ customer.phone or 'Not provided' }}
+      </div>
+    </div>
+    <a href="{{ url_for('staff.customers') }}" class="btn-table-action">&larr; Back to Customers</a>
+  </div>
+</div>
+
+<div class="content-card">
+  <h3 class="content-card-title" style="margin-bottom: 16px;">Active & Past Subscriptions</h3>
+  <div class="table-responsive-custom">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>Number</th>
+          <th>Product / Plan</th>
+          <th>Expiry Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if subscriptions %}
+          {% for s in subscriptions %}
+            <tr>
+              <td><code>{{ s.subscription_number }}</code></td>
+              <td><strong>{{ s.plan.product.product_name }}</strong> ({{ s.plan.plan_name }})</td>
+              <td>{{ s.expiry_date.strftime('%b %d, %Y') }}</td>
+              <td>{{ badge.render_badge(s.status) }}</td>
+              <td>
+                <a href="{{ url_for('staff.subscription_detail', subscription_id=s.subscription_id) }}" class="btn-table-action">
+                  View &rarr;
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="5" style="text-align: center; color: var(--color-text-secondary);">No subscriptions.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<div class="content-card">
+  <h3 class="content-card-title" style="margin-bottom: 16px;">Invoices</h3>
+  <div class="table-responsive-custom">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>Invoice #</th>
+          <th>Date</th>
+          <th>Due Date</th>
+          <th>Total</th>
+          <th>Outstanding</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if invoices %}
+          {% for inv in invoices %}
+            <tr>
+              <td><code>{{ inv.invoice_number }}</code></td>
+              <td>{{ inv.invoice_date.strftime('%b %d, %Y') }}</td>
+              <td>{{ inv.due_date.strftime('%b %d, %Y') }}</td>
+              <td><strong>${{ "%.2f"|format(inv.total_amount) }}</strong></td>
+              <td><strong>${{ "%.2f"|format(inv.outstanding_amount) }}</strong></td>
+              <td>{{ badge.render_badge(inv.status) }}</td>
+              <td>
+                <a href="{{ url_for('staff.invoice_detail', invoice_id=inv.invoice_id) }}" class="btn-table-action">
+                  Manage Invoice &rarr;
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="7" style="text-align: center; color: var(--color-text-secondary);">No invoices.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

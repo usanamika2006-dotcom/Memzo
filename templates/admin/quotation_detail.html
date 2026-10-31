@@ -1,0 +1,77 @@
+{% extends "admin/admin_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}Quotation {{ quotation.quotation_number }} — MEMZO Admin{% endblock %}
+{% block page_title %}Quotation Details{% endblock %}
+
+{% block content %}
+<div class="content-card">
+  <div class="content-card-header">
+    <div>
+      <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 6px;">
+        <h3 class="content-card-title" style="margin-bottom: 0;">{{ quotation.quotation_number }}</h3>
+        {{ badge.render_badge(quotation.status) }}
+      </div>
+      <p style="font-size: 13px; color: var(--color-text-secondary);">
+        Customer: <strong>{{ quotation.customer.name }}</strong> ({{ quotation.customer.email }})
+      </p>
+    </div>
+
+    <div style="display: flex; gap: 10px; align-items: center;">
+      <a href="{{ url_for('admin.quotations') }}" class="btn-table-action">&larr; Back</a>
+
+      <form method="POST" action="{{ url_for('admin.quotation_update_status', quotation_id=quotation.quotation_id) }}" style="display: flex; gap: 8px;">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <select name="status" class="filter-input" style="padding: 6px 12px; font-size: 13px;">
+          <option value="Draft" {% if quotation.status == 'Draft' %}selected{% endif %}>Draft</option>
+          <option value="Sent" {% if quotation.status == 'Sent' %}selected{% endif %}>Sent</option>
+          <option value="Accepted" {% if quotation.status == 'Accepted' %}selected{% endif %}>Accepted</option>
+          <option value="Rejected" {% if quotation.status == 'Rejected' %}selected{% endif %}>Rejected</option>
+          <option value="Expired" {% if quotation.status == 'Expired' %}selected{% endif %}>Expired</option>
+        </select>
+        <button type="submit" class="btn-dark" style="padding: 6px 14px; font-size: 12px;">Update</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="row" style="margin-top: 16px;">
+    <div class="col-md-6">
+      <div style="background: #fafbf9; border-radius: var(--radius-md); border: 1px solid var(--color-border-light); padding: 18px; font-size: 14px;">
+        <div style="margin-bottom: 8px;">Issue Date: <strong>{{ quotation.quotation_date.strftime('%B %d, %Y') }}</strong></div>
+        <div>Valid Until: <strong>{{ quotation.valid_until.strftime('%B %d, %Y') }}</strong></div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top: 28px;">
+    <h4 style="font-size: 16px; font-weight: 800; color: var(--color-text-main); margin-bottom: 14px;">Quoted Line Items</h4>
+    <div class="table-responsive-custom">
+      <table class="table-custom">
+        <thead>
+          <tr>
+            <th>Product</th>
+            <th>Seats / Qty</th>
+            <th>Unit Price</th>
+            <th>Total Amount</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for item in quotation.items %}
+            <tr>
+              <td><strong>{{ item.product.product_name }}</strong></td>
+              <td>{{ item.quantity }}</td>
+              <td>${{ "%.2f"|format(item.unit_price) }}</td>
+              <td><strong style="color: var(--color-deep-teal);">${{ "%.2f"|format(item.total_amount) }}</strong></td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div style="max-width: 320px; margin-left: auto; margin-top: 24px; padding-top: 16px; border-top: 2px solid var(--color-deep-teal); display: flex; justify-content: space-between; font-size: 18px; font-weight: 800; color: var(--color-deep-teal);">
+      <span>Grand Total:</span>
+      <span>${{ "%.2f"|format(quotation.total_amount) }}</span>
+    </div>
+  </div>
+</div>
+{% endblock %}

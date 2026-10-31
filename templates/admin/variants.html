@@ -1,0 +1,86 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}Variants for {{ product.product_name }} — MEMZO Admin{% endblock %}
+{% block page_title %}Product Editions & Variants{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-lg-5">
+    <div class="content-card">
+      <h3 class="content-card-title" style="margin-bottom: 8px;">Add New Variant / Edition</h3>
+      <p style="font-size: 13px; color: var(--color-text-secondary); margin-bottom: 20px;">
+        For product: <strong>{{ product.product_name }}</strong> (Base: ${{ product.sales_price }})
+      </p>
+
+      <form method="POST">
+        {{ form.hidden_tag() }}
+
+        <div class="form-group">
+          <label class="form-label" for="variant_name">{{ form.variant_name.label }}</label>
+          {{ form.variant_name(class="form-control-custom", placeholder="e.g. Enterprise CPA Suite", id="variant_name") }}
+          {% for error in form.variant_name.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="additional_price">{{ form.additional_price.label }}</label>
+          {{ form.additional_price(class="form-control-custom", placeholder="15.00", id="additional_price") }}
+          <div class="form-helper">Added on top of base plan price.</div>
+          {% for error in form.additional_price.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="description">{{ form.description.label }}</label>
+          {{ form.description(class="form-control-custom", rows="3", placeholder="Key features of this edition...", id="description") }}
+          {% for error in form.description.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+
+        {{ form.submit(class="btn-lime", style="width: 100%;") }}
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="content-card">
+      <div class="content-card-header">
+        <h3 class="content-card-title">Existing Variants</h3>
+        <a href="{{ url_for('admin.products') }}" class="btn-table-action">&larr; Back to Products</a>
+      </div>
+
+      <div class="table-responsive-custom">
+        <table class="table-custom">
+          <thead>
+            <tr>
+              <th>Variant Name</th>
+              <th>Surcharge</th>
+              <th>Description</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% if variants %}
+              {% for v in variants %}
+                <tr>
+                  <td><strong>{{ v.variant_name }}</strong></td>
+                  <td><strong style="color: #0c6943;">+${{ v.additional_price }}</strong></td>
+                  <td style="font-size: 13px; color: var(--color-text-secondary);">{{ v.description or 'Standard features' }}</td>
+                </tr>
+              {% endfor %}
+            {% else %}
+              <tr>
+                <td colspan="3" style="text-align: center; color: var(--color-text-secondary); padding: 30px;">
+                  No variants added yet.
+                </td>
+              </tr>
+            {% endif %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,339 @@
+{% extends "base.html" %}
+
+{% block title %}MEMZO — Your Subscriptions. One Smarter Platform.{% endblock %}
+
+{% block content %}
+<!-- ================= SECTION 1: HERO SECTION ================= -->
+<section class="hero-section">
+  <!-- Glowing neon radial aura in the center -->
+  <div class="hero-glow-halo"></div>
+
+  <!-- Hero Headline in Mint Green (#91E8C1) -->
+  <h1 class="hero-headline">The subscription platform that gets jobs done.</h1>
+
+  <!-- Supporting description -->
+  <p class="hero-description">
+    With MEMZO, automated billing and seamless lifecycle tools ensure your software revenue stays predictable, while smart controls help your business grow faster.
+  </p>
+
+  <!-- Lime Green (#C9FF82) CTA Button -->
+  <div class="hero-cta-wrapper">
+    <a href="{{ url_for('public.products') }}" class="btn-lime hero-cta-btn">
+      Discover Our Offers
+    </a>
+  </div>
+
+  <div class="hero-subtext">
+    From $19/month excl. VAT. Try it free for 14 days.
+  </div>
+
+  <div class="hero-rating">
+    <span class="star">★ 4.8</span>
+    <span>• Loved & trusted by 500+ software businesses</span>
+  </div>
+
+  <!-- Hero Visual Composition strictly reproducing reference collage -->
+  <div class="hero-composition">
+    <div class="hero-visual-grid">
+      <!-- Far Left Tilted Card -->
+      <div class="hero-side-card hero-side-card-far card-far-left">
+        <img src="{{ url_for('static', filename='images/showcase-1.jpg') }}" alt="Team SaaS Workflow">
+      </div>
+
+      <!-- Left Tilted Card (POS / Tap) -->
+      <div class="hero-side-card card-pos">
+        <img src="{{ url_for('static', filename='images/hero-pos.jpg') }}" alt="Payment Processing">
+      </div>
+
+      <!-- Center Glowing Hero Mobile Device Mockup -->
+      <div class="hero-center-phone">
+        <img src="{{ url_for('static', filename='images/hero-phone.jpg') }}" alt="MEMZO Mobile Subscription App">
+      </div>
+
+      <!-- Right Tilted Card (MEMZO Business Card) -->
+      <div class="hero-side-card card-card">
+        <img src="{{ url_for('static', filename='images/hero-card.jpg') }}" alt="MEMZO Card">
+      </div>
+
+      <!-- Far Right Tilted Card -->
+      <div class="hero-side-card hero-side-card-far card-far-right">
+        <img src="{{ url_for('static', filename='images/showcase-4.jpg') }}" alt="Subscription Management">
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SECTION 2: PRODUCT / BRAND STRIP ================= -->
+<section class="logo-strip-section">
+  <div class="logo-strip-container">
+    <div class="partner-logo-item">
+      <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      BrightBooks
+    </div>
+    <div class="partner-logo-item">
+      <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      StaffTrack
+    </div>
+    <div class="partner-logo-item">
+      <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+      StockMaster
+    </div>
+    <div class="partner-logo-item">
+      <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+      EduManage
+    </div>
+    <div class="partner-logo-item">
+      <svg viewBox="0 0 24 24"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      ShopFlow
+    </div>
+    <div class="partner-logo-item">
+      <svg viewBox="0 0 24 24"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+      CloudPulse
+    </div>
+    <div class="partner-logo-item">
+      <svg viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+      DevMetrics
+    </div>
+  </div>
+</section>
+
+<!-- ================= SECTION 3: CORE FEATURES WITH TABS ================= -->
+<section class="features-section" id="features">
+  <h2 class="section-title">Core Features That Power Your Subscription Freedom</h2>
+  <p class="section-subtitle">
+    Stay in control with smart, secure, and seamless tools built for today's software revenue movement.
+  </p>
+
+  <!-- Horizontal Tab Navigation matching reference -->
+  <div class="feature-tabs-nav">
+    <button class="feature-tab-btn active" data-tab="tab-plans">Product Management</button>
+    <button class="feature-tab-btn" data-tab="tab-tracking">Subscription Tracking</button>
+    <button class="feature-tab-btn" data-tab="tab-invoicing">Invoices & Payments</button>
+    <button class="feature-tab-btn" data-tab="tab-discounts">Discounts & Taxes</button>
+  </div>
+
+  <!-- ================= SECTION 4: FEATURE SHOWCASE (TWO-COLUMN SPLIT) ================= -->
+  <!-- Tab 1: Product Management -->
+  <div class="feature-showcase-split feature-tab-content" id="tab-plans">
+    <div>
+      <div class="kicker">QUICK SETUP • SMART TOOLS • ALWAYS ON</div>
+      <h3 class="split-title">A subscription platform that means business</h3>
+      <p class="split-desc">
+        Easy day-to-day operations: instant software licensing, automated MasterCard/Visa payment simulation, flexible multi-seat variants, and transparent billing cycles. All included in your unified MEMZO catalogue.
+      </p>
+      <a href="{{ url_for('public.products') }}" class="btn-dark">
+        Explore Software Products
+      </a>
+    </div>
+
+    <div class="showcase-visual-wrapper">
+      <div class="showcase-lime-card">
+        <img src="{{ url_for('static', filename='images/feature-mockup.jpg') }}" alt="Subscription Plan Preview">
+      </div>
+      <div class="showcase-dark-card">
+        <div>
+          <span class="metric-label">Monthly Recurring</span>
+          <div class="metric-val">$18,450</div>
+          <span class="metric-badge">+14.8% growth</span>
+        </div>
+        <div style="font-size: 13px; color: #8daea0; line-height: 1.5;">
+          Automated multi-currency billing and instant settlement notifications for enterprise plans.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 2: Subscription Tracking -->
+  <div class="feature-showcase-split feature-tab-content" id="tab-tracking" style="display: none;">
+    <div>
+      <div class="kicker">LIFECYCLE CONTROL • REAL-TIME METRICS</div>
+      <h3 class="split-title">Real-time status tracking with zero friction</h3>
+      <p class="split-desc">
+        Monitor subscription states from quotation to active renewals. Automated expiry checks ensure continuous access while providing self-service renewal actions for customers.
+      </p>
+      <a href="{{ url_for('auth.register') }}" class="btn-dark">
+        Start Free Trial
+      </a>
+    </div>
+
+    <div class="showcase-visual-wrapper">
+      <div class="showcase-lime-card">
+        <img src="{{ url_for('static', filename='images/hero-phone.jpg') }}" alt="Real-time Tracking Mockup">
+      </div>
+      <div class="showcase-dark-card">
+        <div>
+          <span class="metric-label">Active Subscriptions</span>
+          <div class="metric-val">1,248</div>
+          <span class="metric-badge">99.4% retention</span>
+        </div>
+        <div style="font-size: 13px; color: #8daea0; line-height: 1.5;">
+          Intelligent churn prevention with automatic renewal prompts and notification delivery.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 3: Invoices & Payments -->
+  <div class="feature-showcase-split feature-tab-content" id="tab-invoicing" style="display: none;">
+    <div>
+      <div class="kicker">TAX-COMPLIANT • PARTIAL PAYMENTS</div>
+      <h3 class="split-title">Automated invoicing and payment reconciliation</h3>
+      <p class="split-desc">
+        Generate compliant tax invoices automatically on confirmation. Support full and partial simulated settlements with instant outstanding balance updates and downloadable statements.
+      </p>
+      <a href="{{ url_for('public.products') }}" class="btn-dark">
+        View Invoicing Demo
+      </a>
+    </div>
+
+    <div class="showcase-visual-wrapper">
+      <div class="showcase-lime-card">
+        <img src="{{ url_for('static', filename='images/feature-mockup.jpg') }}" alt="Invoice Processing">
+      </div>
+      <div class="showcase-dark-card">
+        <div>
+          <span class="metric-label">Collected Today</span>
+          <div class="metric-val">$4,280</div>
+          <span class="metric-badge">Zero Overdue</span>
+        </div>
+        <div style="font-size: 13px; color: #8daea0; line-height: 1.5;">
+          Direct audit trail with immutable payment references and real-time ledger synchronization.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tab 4: Discounts & Taxes -->
+  <div class="feature-showcase-split feature-tab-content" id="tab-discounts" style="display: none;">
+    <div>
+      <div class="kicker">FLEXIBLE PROMOS • DYNAMIC TAX RULES</div>
+      <h3 class="split-title">Configure rules that match your market</h3>
+      <p class="split-desc">
+        Administer percentage and fixed promotional campaigns with custom expiration dates and usage quotas. Apply jurisdiction-based VAT and digital services taxes effortlessly at checkout.
+      </p>
+      <a href="{{ url_for('public.products') }}" class="btn-dark">
+        Browse Promotional Offers
+      </a>
+    </div>
+
+    <div class="showcase-visual-wrapper">
+      <div class="showcase-lime-card">
+        <img src="{{ url_for('static', filename='images/hero-card.jpg') }}" alt="Discounts Preview">
+      </div>
+      <div class="showcase-dark-card">
+        <div>
+          <span class="metric-label">Active Promos</span>
+          <div class="metric-val">3 Rules</div>
+          <span class="metric-badge">WELCOME20 Active</span>
+        </div>
+        <div style="font-size: 13px; color: #8daea0; line-height: 1.5;">
+          Automatic server-side validation protects margins while maximizing customer acquisition.
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ================= SECTION 5: 4-CARD USE-CASE SHOWCASE ================= -->
+<section class="usecase-section">
+  <h2 class="section-title">Where businesses scale their software operations,</h2>
+  <p class="section-subtitle">
+    Scale — and save — with unified software billing, tiered seat plans, and automated customer success.
+  </p>
+
+  <div class="usecase-grid">
+    <!-- Card 1: Cloud SaaS Software (Dark Teal Overlay) -->
+    <a href="{{ url_for('public.products') }}" class="usecase-card">
+      <img src="{{ url_for('static', filename='images/showcase-1.jpg') }}" alt="Cloud SaaS Apps" class="usecase-card-img">
+      <div class="usecase-bottom-pill pill-teal">
+        <div class="usecase-pill-title">Cloud SaaS Software</div>
+        <div class="usecase-pill-desc">Manage multi-seat licenses, team add-ons, and automated recurring billing across accounting & HR tools.</div>
+      </div>
+    </a>
+
+    <!-- Card 2: Subscription Services (Mint Green Overlay) -->
+    <a href="{{ url_for('public.products') }}" class="usecase-card">
+      <img src="{{ url_for('static', filename='images/showcase-2.jpg') }}" alt="Subscription Services" class="usecase-card-img">
+      <div class="usecase-bottom-pill pill-mint">
+        <div class="usecase-pill-title">Subscription Services</div>
+        <div class="usecase-pill-desc">Seamless monthly and yearly billing cycles with automated reminders and self-service renewals.</div>
+      </div>
+    </a>
+
+    <!-- Card 3: Enterprise Suites (Lime Green Overlay) -->
+    <a href="{{ url_for('public.products') }}" class="usecase-card">
+      <img src="{{ url_for('static', filename='images/showcase-3.jpg') }}" alt="Enterprise Suites" class="usecase-card-img">
+      <div class="usecase-bottom-pill pill-lime">
+        <div class="usecase-pill-title">Enterprise Suites</div>
+        <div class="usecase-pill-desc">Custom quotation approvals, volume tier discounts, and dedicated invoice settlement terms.</div>
+      </div>
+    </a>
+
+    <!-- Card 4: In-App Addons (Soft Cream/Coral Overlay) -->
+    <a href="{{ url_for('public.products') }}" class="usecase-card">
+      <img src="{{ url_for('static', filename='images/showcase-4.jpg') }}" alt="In-App Addons" class="usecase-card-img">
+      <div class="usecase-bottom-pill pill-coral">
+        <div class="usecase-pill-title">In-App Addons</div>
+        <div class="usecase-pill-desc">Modular variants, extra capacity packs, and instant license activations for growing businesses.</div>
+      </div>
+    </a>
+  </div>
+</section>
+
+<!-- ================= LIVE PRODUCT CATALOGUE PREVIEW ================= -->
+{% if products %}
+<section style="background-color: #fafbf9; padding: 70px 24px; border-top: 1px solid var(--color-border-light);">
+  <div style="max-width: 1200px; margin: 0 auto;">
+    <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 36px; flex-wrap: wrap; gap: 16px;">
+      <div>
+        <div class="kicker">DATABASE-POWERED SOFTWARE SUITE</div>
+        <h2 style="font-size: 32px; font-weight: 800; color: var(--color-text-main); letter-spacing: -0.02em;">Featured Software Products</h2>
+      </div>
+      <a href="{{ url_for('public.products') }}" class="btn-dark">
+        View All Products &rarr;
+      </a>
+    </div>
+
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+      {% for product in products[:3] %}
+        <div style="background: white; border-radius: var(--radius-lg); border: 1px solid var(--color-border-light); padding: 26px; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); transition: transform 0.2s ease;">
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+              <span style="background: #f0f7f3; color: var(--color-deep-teal); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: var(--radius-full); text-transform: uppercase;">
+                {{ product.product_type }}
+              </span>
+              <span style="font-size: 18px; font-weight: 800; color: var(--color-deep-teal);">
+                From ${{ product.sales_price }}<span style="font-size: 12px; color: var(--color-text-secondary); font-weight: 500;">/mo</span>
+              </span>
+            </div>
+
+            <h3 style="font-size: 20px; font-weight: 800; color: var(--color-text-main); margin-bottom: 10px;">
+              {{ product.product_name }}
+            </h3>
+
+            <p style="font-size: 14px; color: var(--color-text-secondary); line-height: 1.6; margin-bottom: 20px;">
+              {{ product.description[:130] }}...
+            </p>
+
+            {% if product.variants %}
+              <div style="margin-bottom: 18px; font-size: 12px; color: var(--color-text-secondary);">
+                <strong>Available Editions:</strong> {{ product.variants|length }} variants available
+              </div>
+            {% endif %}
+          </div>
+
+          <div style="padding-top: 18px; border-top: 1px solid var(--color-border-light); display: flex; justify-content: space-between; align-items: center;">
+            <a href="{{ url_for('public.product_detail', product_id=product.product_id) }}" style="font-size: 13px; font-weight: 700; color: var(--color-deep-teal); text-decoration: none;">
+              Learn More & Plans &rarr;
+            </a>
+            <a href="{{ url_for('public.product_detail', product_id=product.product_id) }}" class="btn-lime" style="padding: 8px 18px; font-size: 13px;">
+              Subscribe
+            </a>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section>
+{% endif %}
+{% endblock %}

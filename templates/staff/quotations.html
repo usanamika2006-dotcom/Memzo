@@ -1,0 +1,47 @@
+{% extends "staff/staff_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}Quotations — MEMZO Staff{% endblock %}
+{% block page_title %}Commercial Quotations{% endblock %}
+
+{% block content %}
+<div class="content-card">
+  <div class="content-card-header">
+    <h3 class="content-card-title">Commercial Quotations</h3>
+    <a href="{{ url_for('staff.quotation_add') }}" class="btn-lime">
+      + Draft Quotation
+    </a>
+  </div>
+
+  <div class="table-responsive-custom">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>Quote #</th>
+          <th>Customer</th>
+          <th>Date</th>
+          <th>Valid Until</th>
+          <th>Total Amount</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if quotations %}
+          {% for q in quotations %}
+            <tr>
+              <td><code>{{ q.quotation_number }}</code></td>
+              <td><strong>{{ q.customer.name }}</strong></td>
+              <td>{{ q.quotation_date.strftime('%b %d, %Y') }}</td>
+              <td>{{ q.valid_until.strftime('%b %d, %Y') }}</td>
+              <td><strong style="color: var(--color-deep-teal);">${{ "%.2f"|format(q.total_amount) }}</strong></td>
+              <td>{{ badge.render_badge(q.status) }}</td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="6" style="text-align: center; color: var(--color-text-secondary); padding: 30px;">No quotations found.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

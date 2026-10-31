@@ -1,0 +1,129 @@
+{% extends "admin/admin_base.html" %}
+
+{% block title %}{{ title }} — MEMZO Admin{% endblock %}
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="content-card" style="max-width: 820px; margin: 0 auto;">
+  <div class="content-card-header">
+    <div>
+      <h3 class="content-card-title">{{ title }}</h3>
+      <p style="font-size: 13px; color: var(--color-text-secondary); margin-top: 4px;">
+        Configure recurring plan rates, billing duration, seat thresholds, and lifecycle controls.
+      </p>
+    </div>
+    <a href="{{ url_for('admin.plans') }}" class="btn-table-action">&larr; Back to Plans</a>
+  </div>
+
+  <form method="POST">
+    {{ form.hidden_tag() }}
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-label" for="product_id">{{ form.product_id.label }}</label>
+          {{ form.product_id(class="form-control-custom", id="product_id") }}
+          {% for error in form.product_id.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-label" for="plan_name">{{ form.plan_name.label }}</label>
+          {{ form.plan_name(class="form-control-custom", placeholder="e.g. Monthly Starter", id="plan_name") }}
+          {% for error in form.plan_name.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4">
+        <div class="form-group">
+          <label class="form-label" for="billing_cycle">{{ form.billing_cycle.label }}</label>
+          {{ form.billing_cycle(class="form-control-custom", id="billing_cycle") }}
+          {% for error in form.billing_cycle.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="form-group">
+          <label class="form-label" for="price">{{ form.price.label }}</label>
+          {{ form.price(class="form-control-custom", placeholder="29.00", id="price") }}
+          {% for error in form.price.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+      </div>
+
+      <div class="col-md-4">
+        <div class="form-group">
+          <label class="form-label" for="minimum_quantity">{{ form.minimum_quantity.label }}</label>
+          {{ form.minimum_quantity(class="form-control-custom", id="minimum_quantity") }}
+          {% for error in form.minimum_quantity.errors %}
+            <span class="form-error">{{ error }}</span>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-label" for="available_from">{{ form.available_from.label }} (Optional)</label>
+          {{ form.available_from(class="form-control-custom", id="available_from") }}
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div class="form-group">
+          <label class="form-label" for="available_until">{{ form.available_until.label }} (Optional)</label>
+          {{ form.available_until(class="form-control-custom", id="available_until") }}
+        </div>
+      </div>
+    </div>
+
+    <div style="background-color: #fafbf9; border-radius: var(--radius-md); border: 1px solid var(--color-border-light); padding: 18px; margin: 20px 0;">
+      <div style="font-size: 13px; font-weight: 700; color: var(--color-text-main); margin-bottom: 12px;">Lifecycle Policies:</div>
+      
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+        <div style="display: flex; align-items: center; gap: 8px;">
+          {{ form.allow_renew(id="allow_renew", style="accent-color: #062722;") }}
+          <label for="allow_renew" style="font-size: 13px; cursor: pointer; user-select: none;">Allow Self-Renewal</label>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+          {{ form.allow_early_close(id="allow_early_close", style="accent-color: #062722;") }}
+          <label for="allow_early_close" style="font-size: 13px; cursor: pointer; user-select: none;">Allow Early Cancellation</label>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+          {{ form.allow_pause(id="allow_pause", style="accent-color: #062722;") }}
+          <label for="allow_pause" style="font-size: 13px; cursor: pointer; user-select: none;">Allow Subscription Pause</label>
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 8px;">
+          {{ form.auto_close(id="auto_close", style="accent-color: #062722;") }}
+          <label for="auto_close" style="font-size: 13px; cursor: pointer; user-select: none;">Auto-Close on Expiry</label>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group" style="display: flex; align-items: center; gap: 8px;">
+      {{ form.is_active(id="is_active", style="accent-color: #062722; width: 18px; height: 18px;") }}
+      <label for="is_active" style="font-size: 14px; font-weight: 600; cursor: pointer; user-select: none;">
+        Active Plan (Available for Customer Purchase)
+      </label>
+    </div>
+
+    <div style="margin-top: 32px; display: flex; gap: 12px;">
+      {{ form.submit(class="btn-lime", style="padding: 12px 28px;") }}
+      <a href="{{ url_for('admin.plans') }}" class="btn-dark" style="background-color: #64748b;">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

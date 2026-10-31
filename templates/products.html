@@ -1,0 +1,107 @@
+{% extends "base.html" %}
+
+{% block title %}Software Products Catalogue — MEMZO{% endblock %}
+
+{% block content %}
+<!-- Header Banner -->
+<div style="background-color: var(--color-deep-teal); padding: 50px 32px; text-align: center;">
+  <h1 style="color: var(--color-mint-green); font-size: clamp(32px, 4vw, 48px); font-weight: 800; letter-spacing: -0.02em; margin-bottom: 12px;">
+    MEMZO Software Catalogue
+  </h1>
+  <p style="color: #8daea0; font-size: 16px; max-width: 600px; margin: 0 auto;">
+    Explore our proprietary enterprise software solutions. Tailored subscription tiers, instant deployment, and seamless scalability.
+  </p>
+</div>
+
+<!-- Search & Filter Bar -->
+<div style="background-color: #f7faf8; padding: 24px 32px; border-bottom: 1px solid var(--color-border-light);">
+  <div style="max-width: 1200px; margin: 0 auto;">
+    <form method="GET" action="{{ url_for('public.products') }}" style="display: flex; gap: 14px; flex-wrap: wrap; align-items: center;">
+      <input type="text" name="q" value="{{ search }}" placeholder="Search products, keywords, features..." class="filter-input" style="flex-grow: 1; min-width: 260px; padding: 12px 18px;">
+      
+      <select name="type" class="filter-input" style="padding: 12px 18px; min-width: 200px;">
+        <option value="">All Product Categories</option>
+        {% for pt in product_types %}
+          <option value="{{ pt }}" {% if selected_type == pt %}selected{% endif %}>{{ pt }}</option>
+        {% endfor %}
+      </select>
+
+      <button type="submit" class="btn-dark" style="padding: 12px 24px;">Filter</button>
+      {% if search or selected_type %}
+        <a href="{{ url_for('public.products') }}" class="btn-sign-in" style="color: var(--color-deep-teal); border-color: var(--color-border-light);">Clear</a>
+      {% endif %}
+    </form>
+  </div>
+</div>
+
+<!-- Products Grid -->
+<div style="padding: 60px 32px; background-color: var(--color-white);">
+  <div style="max-width: 1200px; margin: 0 auto;">
+    {% if products %}
+      <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 32px;">
+        {% for product in products %}
+          <div style="background: white; border-radius: var(--radius-xl); border: 1.5px solid var(--color-border-light); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; box-shadow: var(--shadow-sm); transition: transform 0.2s ease, box-shadow 0.2s ease;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='var(--shadow-md)';" onmouseout="this.style.transform='none'; this.style.boxShadow='var(--shadow-sm)';">
+            
+            <div style="padding: 28px;">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <span style="background: #f0f7f3; color: var(--color-deep-teal); font-size: 11px; font-weight: 800; padding: 5px 12px; border-radius: var(--radius-full); text-transform: uppercase; letter-spacing: 0.05em;">
+                  {{ product.product_type }}
+                </span>
+                <span style="font-size: 20px; font-weight: 800; color: var(--color-deep-teal);">
+                  ${{ product.sales_price }}<span style="font-size: 12px; color: var(--color-text-secondary); font-weight: 500;"> /mo</span>
+                </span>
+              </div>
+
+              <h3 style="font-size: 22px; font-weight: 800; color: var(--color-text-main); margin-bottom: 10px; letter-spacing: -0.01em;">
+                {{ product.product_name }}
+              </h3>
+
+              <p style="font-size: 14px; color: var(--color-text-secondary); line-height: 1.6; margin-bottom: 24px;">
+                {{ product.description }}
+              </p>
+
+              <!-- Plans Preview -->
+              {% if product.active_plans %}
+                <div style="background: #fafbfc; border-radius: var(--radius-md); padding: 14px 16px; margin-bottom: 20px; border: 1px solid #edf0ec;">
+                  <div style="font-size: 12px; font-weight: 700; color: var(--color-text-main); margin-bottom: 8px;">Available Plans:</div>
+                  <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    {% for p in product.active_plans %}
+                      <span style="font-size: 12px; background: white; border: 1px solid var(--color-border-light); padding: 4px 10px; border-radius: 6px; font-weight: 600; color: var(--color-deep-teal);">
+                        {{ p.plan_name }} (${{ p.price }})
+                      </span>
+                    {% endfor %}
+                  </div>
+                </div>
+              {% endif %}
+
+              {% if product.variants %}
+                <div style="font-size: 12px; color: var(--color-text-secondary);">
+                  <strong>Options:</strong> {{ product.variants|length }} edition tiers available
+                </div>
+              {% endif %}
+            </div>
+
+            <div style="padding: 20px 28px; background-color: #fafbfc; border-top: 1px solid var(--color-border-light); display: flex; justify-content: space-between; align-items: center;">
+              <a href="{{ url_for('public.product_detail', product_id=product.product_id) }}" style="font-size: 14px; font-weight: 700; color: var(--color-deep-teal); text-decoration: none;">
+                View Details &rarr;
+              </a>
+              {% if product.active_plans %}
+                <a href="{{ url_for('public.checkout', plan_id=product.active_plans[0].plan_id) }}" class="btn-lime" style="padding: 9px 20px; font-size: 13px;">
+                  Subscribe Now
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% else %}
+      <div style="text-align: center; padding: 80px 20px;">
+        <div style="font-size: 48px; margin-bottom: 16px;">🔍</div>
+        <h3 style="font-size: 24px; font-weight: 800; color: var(--color-text-main); margin-bottom: 8px;">No software products found</h3>
+        <p style="color: var(--color-text-secondary); max-width: 450px; margin: 0 auto 24px;">No products match your current search query. Try adjusting your search or category filter.</p>
+        <a href="{{ url_for('public.products') }}" class="btn-dark">Reset Search Filters</a>
+      </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "staff/staff_base.html" %}
+{% import "components/status_badge.html" as badge %}
+
+{% block title %}Subscriptions — MEMZO Staff{% endblock %}
+{% block page_title %}Operational Subscriptions{% endblock %}
+
+{% block content %}
+<div class="content-card">
+  <div class="content-card-header">
+    <h3 class="content-card-title">Customer Subscriptions</h3>
+  </div>
+
+  <form method="GET" action="{{ url_for('staff.subscriptions') }}" class="filter-search-bar">
+    <select name="status" class="filter-input" onchange="this.form.submit();">
+      <option value="">All Statuses</option>
+      <option value="Active" {% if status_filter == 'Active' %}selected{% endif %}>Active</option>
+      <option value="Confirmed" {% if status_filter == 'Confirmed' %}selected{% endif %}>Confirmed</option>
+      <option value="Draft" {% if status_filter == 'Draft' %}selected{% endif %}>Draft</option>
+      <option value="Closed" {% if status_filter == 'Closed' %}selected{% endif %}>Closed</option>
+    </select>
+  </form>
+
+  <div class="table-responsive-custom">
+    <table class="table-custom">
+      <thead>
+        <tr>
+          <th>Number</th>
+          <th>Customer</th>
+          <th>Product / Plan</th>
+          <th>Start Date</th>
+          <th>Expiry Date</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if subscriptions %}
+          {% for s in subscriptions %}
+            <tr>
+              <td><code>{{ s.subscription_number }}</code></td>
+              <td><strong>{{ s.customer.name }}</strong></td>
+              <td>{{ s.plan.product.product_name }} ({{ s.plan.plan_name }})</td>
+              <td>{{ s.start_date.strftime('%b %d, %Y') }}</td>
+              <td>{{ s.expiry_date.strftime('%b %d, %Y') }}</td>
+              <td>{{ badge.render_badge(s.status) }}</td>
+              <td>
+                <a href="{{ url_for('staff.subscription_detail', subscription_id=s.subscription_id) }}" class="btn-table-action">
+                  View &rarr;
+                </a>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="7" style="text-align: center; color: var(--color-text-secondary); padding: 30px;">No subscriptions found.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
